@@ -35,45 +35,56 @@ public class EnergyProducerTechnologyPreferences extends EnergyProducer implemen
     /**
      * Booleans good idea?
      */
-
+    // universal company attitudes
     @SimulationParameter(label = "Stereotype based upon company attitude")
-    private boolean greenAttitude;
-    private boolean coalReticent;
-    private boolean profitOnly;
+    private boolean conservativist;
+    private boolean environmentalist;
 
-    @SimulationParameter(label = "Stereotype based upon asset base")
+    // universal market share stereotypes
+    private boolean marketUnderDog;
+    private boolean marketGiant;
+
     private double marketShare;
 
+    public boolean isConservativist() {
+        return conservativist;
+    }
+
+    public void setConservativist(boolean conservativist) {
+        this.conservativist = conservativist;
+    }
+
+    public boolean isEnvironmentalist() {
+        return environmentalist;
+    }
+
+    public void setEnvironmentalist(boolean environmentalist) {
+        this.environmentalist = environmentalist;
+    }
     public double getMarketShare() {
         return marketShare;
     }
-
     public void setMarketShare(double marketShare) {
         this.marketShare = marketShare;
     }
 
-    public boolean isGreenAttitude() {
-        return greenAttitude;
+    public boolean isMarketUnderDog() {
+        return marketUnderDog;
     }
 
-    public void setGreenAttitude(boolean greenAttitude) {
-        this.greenAttitude = greenAttitude;
+    public void setMarketDwarf(boolean marketUnderDog) {
+        this.marketDwarf = marketUnderDog;
     }
 
-    public boolean isCoalReticent() {
-        return coalReticent;
+    public boolean isMarketGiant() {
+        return marketGiant;
     }
 
-    public void setCoalReticent(boolean coalReticent) {
-        this.coalReticent = coalReticent;
+    public void setMarketGiant(boolean marketGiant) {
+        this.marketGiant = marketGiant;
     }
 
-    public boolean isProfitOnly() {
-        return profitOnly;
-    }
 
-    public void setProfitOnly(boolean profitOnly) {
-        this.profitOnly = profitOnly;
-    }
+
 
 }
