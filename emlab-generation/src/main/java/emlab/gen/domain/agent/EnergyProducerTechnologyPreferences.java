@@ -41,7 +41,6 @@ public class EnergyProducerTechnologyPreferences extends EnergyProducer implemen
     // universal market share stereotypes
     private boolean marketUnderDog;
     private boolean marketGiant;
-    private double marketShare;
 
     public boolean isBiasConservativist() {
         return biasConservativist;
@@ -70,15 +69,6 @@ public class EnergyProducerTechnologyPreferences extends EnergyProducer implemen
     public void setMarketGiant(boolean marketGiant) {
         this.marketGiant = marketGiant;
     }
-
-    public double getMarketShare() {
-        return marketShare;
-    }
-
-    public void setMarketShare(double marketShare) {
-        this.marketShare = marketShare;
-    }
-
 
 
 }
