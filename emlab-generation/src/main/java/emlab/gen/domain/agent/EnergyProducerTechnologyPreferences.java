@@ -32,58 +32,52 @@ import agentspring.simulation.SimulationParameter;
 @NodeEntity
 public class EnergyProducerTechnologyPreferences extends EnergyProducer implements Agent {
 
-    /**
-     * Booleans good idea?
-     */
+
     // universal company attitudes
     @SimulationParameter(label = "Stereotype based upon company attitude")
-    private boolean conservativist;
-    private boolean environmentalist;
+    private boolean biasConservativist;
+    private boolean biasEnvironmentalist;
 
     // universal market share stereotypes
     private boolean marketUnderDog;
     private boolean marketGiant;
-
     private double marketShare;
 
-    public boolean isConservativist() {
-        return conservativist;
+    public boolean isBiasConservativist() {
+        return biasConservativist;
     }
 
-    public void setConservativist(boolean conservativist) {
-        this.conservativist = conservativist;
+    public void setBiasConservativist(boolean biasConservativist) {
+        this.biasConservativist = biasConservativist;
     }
 
-    public boolean isEnvironmentalist() {
-        return environmentalist;
+    public boolean isBiasEnvironmentalist() {
+        return biasEnvironmentalist;
     }
 
-    public void setEnvironmentalist(boolean environmentalist) {
-        this.environmentalist = environmentalist;
+    public void setBiasEnvironmentalist(boolean biasEnvironmentalist) {
+        this.biasEnvironmentalist = biasEnvironmentalist;
     }
-    public double getMarketShare() {
-        return marketShare;
-    }
-    public void setMarketShare(double marketShare) {
-        this.marketShare = marketShare;
-    }
-
     public boolean isMarketUnderDog() {
         return marketUnderDog;
     }
-
-    public void setMarketDwarf(boolean marketUnderDog) {
-        this.marketDwarf = marketUnderDog;
+    public void setMarketUnderDog(boolean marketUnderDog) {
+        this.marketUnderDog = marketUnderDog;
     }
-
     public boolean isMarketGiant() {
         return marketGiant;
     }
-
     public void setMarketGiant(boolean marketGiant) {
         this.marketGiant = marketGiant;
     }
 
+    public double getMarketShare() {
+        return marketShare;
+    }
+
+    public void setMarketShare(double marketShare) {
+        this.marketShare = marketShare;
+    }
 
 
 
