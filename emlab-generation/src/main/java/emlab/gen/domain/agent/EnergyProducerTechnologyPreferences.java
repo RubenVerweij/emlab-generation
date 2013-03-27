@@ -33,42 +33,24 @@ import agentspring.simulation.SimulationParameter;
 public class EnergyProducerTechnologyPreferences extends EnergyProducer implements Agent {
 
 
-    // universal company attitudes
-    @SimulationParameter(label = "Stereotype based upon company attitude")
-    private boolean biasConservativist;
-    private boolean biasEnvironmentalist;
+    @SimulationParameter(label = "Weightfactor for subjective criteria", from = 0, to = 5)
+    private int weightfactorProfit;
+    private int weightfactorEmission;
 
-    // universal market share stereotypes
-    private boolean marketUnderDog;
-    private boolean marketGiant;
-
-    public boolean isBiasConservativist() {
-        return biasConservativist;
+    public int getWeightfactorProfit() {
+        return weightfactorProfit;
     }
 
-    public void setBiasConservativist(boolean biasConservativist) {
-        this.biasConservativist = biasConservativist;
+    public void setWeightfactorProfit(int weightfactorProfit) {
+        this.weightfactorProfit = weightfactorProfit;
     }
 
-    public boolean isBiasEnvironmentalist() {
-        return biasEnvironmentalist;
+    public int getWeightfactorEmission() {
+        return weightfactorEmission;
     }
 
-    public void setBiasEnvironmentalist(boolean biasEnvironmentalist) {
-        this.biasEnvironmentalist = biasEnvironmentalist;
+    public void setWeightfactorEmission(int weightfactorEmission) {
+        this.weightfactorEmission = weightfactorEmission;
     }
-    public boolean isMarketUnderDog() {
-        return marketUnderDog;
-    }
-    public void setMarketUnderDog(boolean marketUnderDog) {
-        this.marketUnderDog = marketUnderDog;
-    }
-    public boolean isMarketGiant() {
-        return marketGiant;
-    }
-    public void setMarketGiant(boolean marketGiant) {
-        this.marketGiant = marketGiant;
-    }
-
 
 }
