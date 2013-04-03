@@ -112,6 +112,9 @@ implements Role<T>, NodeBacked {
 
             double highestValue = Double.MIN_VALUE;
             PowerGeneratingTechnology bestTechnology = null;
+            double technologyProbability;
+            double technologyPropensity;
+            
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
@@ -273,10 +276,21 @@ implements Role<T>, NodeBacked {
                          * Divide by capacity, in order not to favour large power plants (which have the single largest NPV
                          */
 
-                        if (projectValue > 0 && projectValue / plant.getActualNominalCapacity() > highestValue) {
-                            highestValue = projectValue / plant.getActualNominalCapacity();
-                            bestTechnology = plant.getTechnology();
+                        // Now the NPV's are estimated the attitude filter is added here the propensities are calculated
+                        // for the chance of investing in a certain technology
+                        
+                                             
+                        for (projectValue > 0) {
+                        
+                        technologyPropensity = producer.
+                        	
+                        	
                         }
+                        
+                        //if (projectValue > 0 && projectValue / plant.getActualNominalCapacity() > highestValue) {
+                        //    highestValue = projectValue / plant.getActualNominalCapacity();
+                        //    bestTechnology = plant.getTechnology();
+                        //}
                     }
 
                 }
