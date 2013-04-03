@@ -30,7 +30,7 @@ import agentspring.simulation.SimulationParameter;
  */
 
 @NodeEntity
-public class EnergyProducerTechnologyPreferences extends DecarbonizationAgent implements Agent {
+public class EnergyProducerTechnologyPreferences extends EnergyProducer implements Agent {
 
     @SimulationParameter(label = "Weightfactor for subjective criteria", from = 0, to = 5)
     private int weightfactorProfit;

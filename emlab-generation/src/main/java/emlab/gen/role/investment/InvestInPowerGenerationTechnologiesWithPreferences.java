@@ -28,8 +28,11 @@ import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import agentspring.role.Role;
+import cern.jet.random.Empirical;
+import cern.jet.random.EmpiricalWalker;
 import emlab.gen.domain.agent.BigBank;
 import emlab.gen.domain.agent.EnergyProducer;
+import emlab.gen.domain.agent.EnergyProducerTechnologyPreferences;
 import emlab.gen.domain.agent.PowerPlantManufacturer;
 import emlab.gen.domain.contract.CashFlow;
 import emlab.gen.domain.contract.Loan;
@@ -54,7 +57,7 @@ import emlab.gen.util.MapValueComparator;
  *         preferences based upon market-share and company attitude.
  * 
  */
-public class InvestInPowerGenerationTechnologiesWithPreferences<T extends EnergyProducer> extends
+public class InvestInPowerGenerationTechnologiesWithPreferences<T extends EnergyProducerTechnologyPreferences> extends
         GenericInvestmentRole<T> implements Role<T>, NodeBacked {
 
     @Transient
@@ -69,6 +72,7 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
     @Transient
     Map<ElectricitySpotMarket, MarketInformation> marketInfoMap = new HashMap<ElectricitySpotMarket, MarketInformation>();
 
+    @Autowired
     @Override
     public void act(T agent) {
 
@@ -115,8 +119,12 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
 
             double highestValue = Double.MIN_VALUE;
             PowerGeneratingTechnology bestTechnology = null;
-            double technologyProbability;
-            double technologyPropensity;
+
+            // Variables for MCDA
+            double npvTechnology = Double.MIN_VALUE;
+            double npvTotal = Double.MIN_VALUE;
+            double footprintTechnology = Double.MIN_VALUE;
+            double footprintTotal = Double.MIN_VALUE;
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
@@ -284,26 +292,115 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                         // double projectReturnOnInvestment = discountedOpProfit
                         // / (-discountedCapitalCosts);
 
+                        //
+                        // calculate cumulative NPV and Footprint per MWh for
+                        // attitude, todo check whether the footprint
+                        // calculation
+                        // could be better?
+                        //
+                        if (projectValue > 0) {
+                            npvTechnology = projectValue;
+                            npvTotal += projectValue;
+                            footprintTechnology = technology.getMainFuel().getEnergyDensity()
+                                    * technology.getCo2CaptureEffciency();
+                            footprintTotal += technology.getMainFuel().getEnergyDensity()
+                                    * technology.getCo2CaptureEffciency();
+                        }
+
                         /*
                          * Divide by capacity, in order not to favour large
                          * power plants (which have the single largest NPV
                          */
 
-                        // Now the NPV's are estimated the attitude filter is
-                        // added here the propensities are calculated
-                        // for the chance of investing in a certain technology
-
-                        // for (projectValue > 0) {
-                        // technologyPropensity = agent.get
-
-                        if (projectValue > 0 && projectValue / plant.getActualNominalCapacity() > highestValue) {
-                            highestValue = projectValue / plant.getActualNominalCapacity();
-                            bestTechnology = plant.getTechnology();
-                        }
+                        // if (projectValue > 0 && projectValue /
+                        // plant.getActualNominalCapacity() > highestValue) {
+                        // highestValue = projectValue /
+                        // plant.getActualNominalCapacity();
+                        // bestTechnology = plant.getTechnology();
+                        // }
                     }
 
                 }
             }
+
+            // Now the NPV's are estimated the attitude filter is
+            // added here the propensities are calculated
+            // for the chance of investing in a certain technology
+
+            // ----------MCDA-------------
+
+            double totalPropensity = Double.MIN_VALUE;
+            double technologyPropensity = Double.MIN_VALUE;
+
+            // calculate propensity / utility
+
+            for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
+                if (npvTechnology > 0) {
+                    technologyPropensity = agent.getWeightfactorProfit() * npvTechnology / npvTotal
+                            + agent.getWeightfactorEmission() * footprintTechnology / footprintTotal;
+                } else {
+                    technologyPropensity = 0;
+                }
+                totalPropensity += technologyPropensity;
+            }
+
+            // calculate probability and add information to lists for discrete
+            // distribution
+
+            double technologyProbability = Double.MIN_VALUE;
+            double totalProbability = Double.MIN_VALUE;
+
+            // List<String> technologyNamesList = new ArrayList<String>();
+            // ArrayList<Double> technologyProbabilitiesList = new
+            // ArrayList<Double>();
+
+            PowerGeneratingTechnology[] technologyNamesArray = new PowerGeneratingTechnology[0];
+            double[] technologyProbabilitiesArray = new double[0];
+            int i = 0;
+
+            for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
+
+                // technologyProbability = technologyPropensity /
+                // totalPropensity;
+                // technologyNamesList.add(technology.getName());
+
+                technologyNamesArray[i] = technology;
+                technologyProbabilitiesArray[i] = technologyProbability;
+                i++;
+                // verification cumulative probability = 1
+                totalProbability += technologyProbability;
+
+            }
+
+            // --- option one just select the investment with the highest
+            // probability ---
+
+            // for (PowerGeneratingTechnology technology :
+            // reps.genericRepository.findAll(PowerGeneratingTechnology.class))
+            // {
+            // PowerPlant plant = new PowerPlant();
+            // if (technologyProbability > 0 && technologyProbability >
+            // highestValue) {
+            // highestValue = technologyProbability;
+            // // bestTechnology = plant.getTechnology();
+            // }
+            // }
+
+            // --- option two setting probability mass function and select the
+            // investment option on the basis of a random number.
+
+            int k;
+
+            EmpiricalWalker em = new EmpiricalWalker(technologyProbabilitiesArray, Empirical.NO_INTERPOLATION,
+                    EmpiricalWalker.makeDefaultGenerator());
+            k = em.nextInt();
+            bestTechnology = technologyNamesArray[k];
+
+            // Another option to include a discrete distribution
+            // DiscreteProbability(List<String> technologyNames, List<Double>
+            // technologyProbabilities);
+            // sample(DiscreteProbability(technologyNames,
+            // technologyProbabilities));
 
             if (bestTechnology != null) {
                 // logger.warn("Agent {} invested in technology {} at tick " +
