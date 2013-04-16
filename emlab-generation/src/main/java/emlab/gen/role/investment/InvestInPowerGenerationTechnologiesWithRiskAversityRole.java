@@ -241,10 +241,40 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
                         // such as amount of money, market share, portfolio
                         // size.
 
+                        // Include risk averse behaviour, influences the wacc
+                        // value
+
+                        String substance = technology.getMainFuel().getName();
+                        double wacc = Double.MIN_VALUE;
+
+                        if (substance == "Uranium") {
+
+                            wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
+                                    + agent.getRiskPremiumNuclear() + agent.getDebtRatioOfInvestments()
+                                    * agent.getLoanInterestRate();
+                        } else if (substance == "Coal") {
+                            wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
+                                    + agent.getRiskPremiumCoal() + agent.getDebtRatioOfInvestments()
+                                    * agent.getLoanInterestRate();
+
+                        } else if (substance == "Gas") {
+                            wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
+                                    + agent.getRiskPremiumGas() + agent.getDebtRatioOfInvestments()
+                                    * agent.getLoanInterestRate();
+
+                        } else {
+                            wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
+                                    + agent.getRiskPremiumRenewable() + agent.getDebtRatioOfInvestments()
+                                    * agent.getLoanInterestRate();
+                        }
+
                         // Calculation of weighted average cost of capital,
                         // based on the companies debt-ratio
-                        double wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
-                                + agent.getDebtRatioOfInvestments() * agent.getLoanInterestRate();
+
+                        // wacc = (1 - agent.getDebtRatioOfInvestments()) *
+                        // agent.getEquityInterestRate()
+                        // + agent.getDebtRatioOfInvestments() *
+                        // agent.getLoanInterestRate();
 
                         // Creation of out cash-flow during power plant building
                         // phase (note that the cash-flow is negative!)

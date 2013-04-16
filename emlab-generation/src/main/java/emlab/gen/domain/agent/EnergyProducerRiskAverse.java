@@ -18,6 +18,7 @@ package emlab.gen.domain.agent;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 
 import agentspring.agent.Agent;
+import agentspring.simulation.SimulationParameter;
 
 /**
  * @rubenverweij Ruben: this energy producer includes risk averse behaviour
@@ -28,5 +29,81 @@ import agentspring.agent.Agent;
 
 @NodeEntity
 public class EnergyProducerRiskAverse extends EnergyProducer implements Agent {
+
+    // @RelatedTo(type = "PRODUCER_PRODUCERCREDITRISK", elementClass =
+    // EnergyProducerCreditRisk.class, direction = Direction.OUTGOING)
+    // EnergyProducerCreditRisk energyProducerCreditRisk;
+
+    // agent is risk averse / taker for particular technologies
+    @SimulationParameter(label = "Risk premium technology", from = -0.05, to = 0.05)
+    private double riskPremiumNuclear;
+    private double riskPremiumCoal;
+    private double riskPremiumGas;
+    private double riskPremiumRenewable;
+
+    // agent tends to invest in conventional technologies
+    private boolean conservativenessRiskProfile;
+
+    // agent tends to diversify technologies
+    private boolean progressivenessRiskProfile;
+
+    // agent tends to follow popular technologies
+    private boolean followersProfile;
+
+    public double getRiskPremiumNuclear() {
+        return riskPremiumNuclear;
+    }
+
+    public void setRiskPremiumNuclear(double riskPremiumNuclear) {
+        this.riskPremiumNuclear = riskPremiumNuclear;
+    }
+
+    public double getRiskPremiumCoal() {
+        return riskPremiumCoal;
+    }
+
+    public void setRiskPremiumCoal(double riskPremiumCoal) {
+        this.riskPremiumCoal = riskPremiumCoal;
+    }
+
+    public double getRiskPremiumGas() {
+        return riskPremiumGas;
+    }
+
+    public void setRiskPremiumGas(double riskPremiumGas) {
+        this.riskPremiumGas = riskPremiumGas;
+    }
+
+    public double getRiskPremiumRenewable() {
+        return riskPremiumRenewable;
+    }
+
+    public void setRiskPremiumRenewable(double riskPremiumRenewable) {
+        this.riskPremiumRenewable = riskPremiumRenewable;
+    }
+
+    public boolean isConservativenessRiskProfile() {
+        return conservativenessRiskProfile;
+    }
+
+    public void setConservativenessRiskProfile(boolean conservativenessRiskProfile) {
+        this.conservativenessRiskProfile = conservativenessRiskProfile;
+    }
+
+    public boolean isProgressivenessRiskProfile() {
+        return progressivenessRiskProfile;
+    }
+
+    public void setProgressivenessRiskProfile(boolean progressivenessRiskProfile) {
+        this.progressivenessRiskProfile = progressivenessRiskProfile;
+    }
+
+    public boolean isFollowersProfile() {
+        return followersProfile;
+    }
+
+    public void setFollowersProfile(boolean followersProfile) {
+        this.followersProfile = followersProfile;
+    }
 
 }
