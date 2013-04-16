@@ -25,5 +25,5 @@ import agentspring.agent.Agent;
  */
 
 @NodeEntity
-public class EnergyProducerMarketShareInfluences extends EnergyProducer implements Agent {
+public class EnergyProducerCreditRisk extends EnergyProducer implements Agent {
 }

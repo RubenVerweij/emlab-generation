@@ -63,7 +63,7 @@ import emlab.gen.util.MapValueComparator;
 
 @Configurable
 @NodeEntity
-public class InvestInPowerGenerationTechnologiesWithMarketShareInfluencesRole<T extends EnergyProducerMarketShareInfluences>
+public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends EnergyProducerMarketShareInfluences>
         extends GenericInvestmentRole<T> implements Role<T>, NodeBacked {
 
     @Transient
