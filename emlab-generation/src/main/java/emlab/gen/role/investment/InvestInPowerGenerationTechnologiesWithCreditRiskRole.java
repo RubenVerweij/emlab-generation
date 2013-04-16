@@ -56,8 +56,7 @@ import emlab.gen.util.MapValueComparator;
  * @author Ruben; algorithm extends the current algorithm with market-share
  *         influences
  * 
- *         1. how easy to get financial approval 2. knowledge limitations 3.
- *         quality of market forecasts
+ *         1. includes credit-risk
  * 
  */
 
@@ -102,6 +101,19 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
                 gtr.addData(time, elm.getDemandGrowthTrend().getValue(time));
             }
             expectedDemand.put(elm, gtr.predict(futureTimePoint));
+        }
+
+        // Total debt and assets calculation at this moment the debt total
+        // includes all debt - payed annunities the asset plant total comprises
+        // of the invested capital minus the depreciation periods
+        double debtTotal = Double.MIN_VALUE;
+        double assetPlantTotal = Double.MIN_VALUE;
+
+        for (PowerPlant plant : reps.powerPlantRepository.findPowerPlantsByOwner(agent)) {
+            debtTotal += plant.getLoan().getTotalNumberOfPayments() * plant.getLoan().getAmountPerPayment()
+                    - plant.getLoan().getNumberOfPaymentsDone() * plant.getLoan().getAmountPerPayment();
+            assetPlantTotal += plant.getActualInvestedCapital() - plant.getActualInvestedCapital()
+                    / plant.getTechnology().getDepreciationTime() * plant.getLoan().getNumberOfPaymentsDone();
         }
 
         // Investment decision
@@ -180,11 +192,14 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
                     // logger.warn(agent +
                     // " will not invest in {} technology because there's too much capacity in the pipeline",
                     // technology);
-                } else if (plant.getActualInvestedCapital() * (1 - agent.getDebtRatioOfInvestments()) > agent
-                        .getDownpaymentFractionOfCash() * agent.getCash()) {
+
+                    // } else if (plant.getActualInvestedCapital() * (1 -
+                    // agent.getDebtRatioOfInvestments()) > agent
+                    // .getDownpaymentFractionOfCash() * agent.getCash()) {
                     // logger.warn(agent +
                     // " will not invest in {} technology as he does not have enough money for downpayment",
                     // technology);
+
                 } else {
 
                     Map<Substance, Double> myFuelPrices = new HashMap<Substance, Double>();
@@ -246,8 +261,26 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
 
                         // Calculation of weighted average cost of capital,
                         // based on the companies debt-ratio
+
+                        // Equity value according to call option solution of
+                        // Black-Scholes
+                        double assetTotal = Double.MIN_VALUE;
+                        assetTotal = agent.getCash() + assetPlantTotal;
+
+                        double d1 = (Math.log(assetTotal / debtTotal) + agent.getLoanInterestFreeRate() + Math.pow(
+                                agent.getAssetValueDeviation(), 2) / 2 * (technology.getDepreciationTime()))
+                                / (agent.getAssetValueDeviation() * Math.sqrt(technology.getDepreciationTime()));
+                        double d2 = d1 - agent.getAssetValueDeviation() * Math.sqrt(technology.getDepreciationTime());
+                        double equityValueBS = assetTotal * d1 - debtTotal
+                                * Math.exp(agent.getLoanInterestFreeRate() * technology.getDepreciationTime()) * d2;
+                        double pricedDebtTotal = assetTotal - equityValueBS;
+
+                        // Calcultion of credit-risk interest rate
+                        double loanInterestRiskRate = -1 / technology.getDepreciationTime()
+                                * Math.log(pricedDebtTotal / debtTotal);
+
                         double wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
-                                + agent.getDebtRatioOfInvestments() * agent.getLoanInterestRate();
+                                + agent.getDebtRatioOfInvestments() * loanInterestRiskRate;
 
                         // Creation of out cash-flow during power plant building
                         // phase (note that the cash-flow is negative!)

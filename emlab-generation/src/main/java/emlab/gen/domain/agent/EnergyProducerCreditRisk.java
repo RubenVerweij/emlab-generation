@@ -18,6 +18,7 @@ package emlab.gen.domain.agent;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 
 import agentspring.agent.Agent;
+import agentspring.simulation.SimulationParameter;
 
 /**
  * @rubenverweij Ruben: this energy producer includes market-share influences
@@ -26,4 +27,50 @@ import agentspring.agent.Agent;
 
 @NodeEntity
 public class EnergyProducerCreditRisk extends EnergyProducer implements Agent {
+
+    // @RelatedTo(type = "PRODUCER_PRODUCERCREDITRISK", elementClass =
+    // EnergyProducerCreditRisk.class, direction = Direction.OUTGOING)
+    // EnergyProducerCreditRisk energyProducerCreditRisk;
+
+    @SimulationParameter(label = "Loan Interest free Rate", from = 0, to = 1)
+    private double loanInterestFreeRate;
+
+    @SimulationParameter(label = "Asset value path deviation", from = 0, to = 1)
+    private double assetValueDeviation;
+
+    private double debtTotal;
+    private double assetTotal;
+
+    public double getDebtTotal() {
+        return debtTotal;
+    }
+
+    public void setDebtTotal(double debtTotal) {
+        this.debtTotal = debtTotal;
+    }
+
+    public double getAssetTotal() {
+        return assetTotal;
+    }
+
+    public void setAssetTotal(double assetTotal) {
+        this.assetTotal = assetTotal;
+    }
+
+    public double getAssetValueDeviation() {
+        return assetValueDeviation;
+    }
+
+    public void setAssetValueDeviation(double assetValueDeviation) {
+        this.assetValueDeviation = assetValueDeviation;
+    }
+
+    public double getLoanInterestFreeRate() {
+        return loanInterestFreeRate;
+    }
+
+    public void setLoanInterestFreeRate(double loanInterestFreeRate) {
+        this.loanInterestFreeRate = loanInterestFreeRate;
+    }
+
 }
