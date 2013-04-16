@@ -125,6 +125,9 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
             double npvTotal = Double.MIN_VALUE;
             double footprintTechnology = Double.MIN_VALUE;
             double footprintTotal = Double.MIN_VALUE;
+            double efficiencyTotal = Double.MIN_VALUE;
+            double lifetimeTotal = Double.MIN_VALUE;
+            double fuelpriceVolatilityTotal = Double.MIN_VALUE;
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
@@ -301,10 +304,15 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                         if (projectValue > 0) {
                             npvTechnology = projectValue;
                             npvTotal += projectValue;
+
                             footprintTechnology = technology.getMainFuel().getEnergyDensity()
-                                    * technology.getCo2CaptureEffciency();
+                                    * (1 - technology.getCo2CaptureEffciency());
                             footprintTotal += technology.getMainFuel().getEnergyDensity()
-                                    * technology.getCo2CaptureEffciency();
+                                    * (1 - technology.getCo2CaptureEffciency());
+
+                            // efficiencyTotal += ;
+                            // fuelpriceVolatilityTotal;
+                            // lifetimeTotal += ;
                         }
 
                         /*

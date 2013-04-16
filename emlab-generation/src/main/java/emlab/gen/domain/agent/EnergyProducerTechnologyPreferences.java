@@ -35,9 +35,36 @@ public class EnergyProducerTechnologyPreferences extends EnergyProducer implemen
     @SimulationParameter(label = "Weightfactor for subjective criteria", from = 0, to = 5)
     private int weightfactorProfit;
     private int weightfactorEmission;
+    private int weightfactorEfficiency;
+    private int weightfactorLifeTime;
+    private int weightfactorFuelPrice;
+
+    public int getWeightfactorLifeTime() {
+        return weightfactorLifeTime;
+    }
+
+    public void setWeightfactorLifeTime(int weightfactorLifeTime) {
+        this.weightfactorLifeTime = weightfactorLifeTime;
+    }
+
+    public int getWeightfactorFuelPrice() {
+        return weightfactorFuelPrice;
+    }
+
+    public void setWeightfactorFuelPrice(int weightfactorFuelPrice) {
+        this.weightfactorFuelPrice = weightfactorFuelPrice;
+    }
 
     public int getWeightfactorProfit() {
         return weightfactorProfit;
+    }
+
+    public int getWeightfactorEfficiency() {
+        return weightfactorEfficiency;
+    }
+
+    public void setWeightfactorEfficiency(int weightfactorEfficiency) {
+        this.weightfactorEfficiency = weightfactorEfficiency;
     }
 
     public void setWeightfactorProfit(int weightfactorProfit) {

@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import agentspring.role.Role;
 import emlab.gen.domain.agent.BigBank;
 import emlab.gen.domain.agent.EnergyProducer;
-import emlab.gen.domain.agent.EnergyProducerMarketShareInfluences;
+import emlab.gen.domain.agent.EnergyProducerCreditRisk;
 import emlab.gen.domain.agent.PowerPlantManufacturer;
 import emlab.gen.domain.contract.CashFlow;
 import emlab.gen.domain.contract.Loan;
@@ -63,8 +63,8 @@ import emlab.gen.util.MapValueComparator;
 
 @Configurable
 @NodeEntity
-public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends EnergyProducerMarketShareInfluences>
-        extends GenericInvestmentRole<T> implements Role<T>, NodeBacked {
+public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends EnergyProducerCreditRisk> extends
+        GenericInvestmentRole<T> implements Role<T>, NodeBacked {
 
     @Transient
     @Autowired
