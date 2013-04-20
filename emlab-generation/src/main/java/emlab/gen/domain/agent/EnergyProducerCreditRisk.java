@@ -38,23 +38,20 @@ public class EnergyProducerCreditRisk extends EnergyProducer implements Agent {
     @SimulationParameter(label = "Asset value path deviation", from = 0, to = 1)
     private double assetValueDeviation;
 
-    private double debtTotal;
-    private double assetTotal;
+    // this debt bias is modelled to test the black-scholes debt pricing model
+    // in a market with more debt than 100 percent of the total asset value.
+    // This implies that companies are required to borrow money against higher
+    // debt-rates.
 
-    public double getDebtTotal() {
-        return debtTotal;
+    @SimulationParameter(label = "Additional debt", from = 0, to = 1e8)
+    private double debtBias;
+
+    public double getDebtBias() {
+        return debtBias;
     }
 
-    public void setDebtTotal(double debtTotal) {
-        this.debtTotal = debtTotal;
-    }
-
-    public double getAssetTotal() {
-        return assetTotal;
-    }
-
-    public void setAssetTotal(double assetTotal) {
-        this.assetTotal = assetTotal;
+    public void setDebtBias(double debtBias) {
+        this.debtBias = debtBias;
     }
 
     public double getAssetValueDeviation() {

@@ -106,14 +106,22 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
         // Total debt and assets calculation at this moment the debt total
         // includes all debt - payed annunities the asset plant total comprises
         // of the invested capital minus the depreciation periods
-        double debtTotal = Double.MIN_VALUE;
-        double assetPlantTotal = Double.MIN_VALUE;
+
+        double debtTotal = 0;
+        double assetPlantTotal = 0;
 
         for (PowerPlant plant : reps.powerPlantRepository.findPowerPlantsByOwner(agent)) {
             debtTotal += plant.getLoan().getTotalNumberOfPayments() * plant.getLoan().getAmountPerPayment()
                     - plant.getLoan().getNumberOfPaymentsDone() * plant.getLoan().getAmountPerPayment();
             assetPlantTotal += plant.getActualInvestedCapital() - plant.getActualInvestedCapital()
                     / plant.getTechnology().getDepreciationTime() * plant.getLoan().getNumberOfPaymentsDone();
+
+        }
+
+        if (agent.getDebtBias() == 0) {
+
+        } else {
+            debtTotal = debtTotal + agent.getDebtBias();
         }
 
         // Investment decision
@@ -263,7 +271,12 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
                         // based on the companies debt-ratio
 
                         // Equity value according to call option solution of
-                        // Black-Scholes
+                        // Black-Scholes here debt-rate of the investor is
+                        // determined based upon the financial structure of the
+                        // investor. Low asset value with respect to debt means
+                        // a
+                        // higher debt rate offer
+
                         double assetTotal = Double.MIN_VALUE;
                         assetTotal = agent.getCash() + assetPlantTotal;
 
@@ -272,7 +285,7 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
                                 / (agent.getAssetValueDeviation() * Math.sqrt(technology.getDepreciationTime()));
                         double d2 = d1 - agent.getAssetValueDeviation() * Math.sqrt(technology.getDepreciationTime());
 
-                        // outcome to standard normal variable, todo
+                        // TODO outcome to standard normal variable
 
                         double n1 = d1;
 
@@ -285,6 +298,8 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
                         // Calcultion of credit-risk interest rate
                         double loanInterestRiskRate = -1 / technology.getDepreciationTime()
                                 * Math.log(pricedDebtTotal / debtTotal);
+
+                        // Determination to accept yes or no?
 
                         double wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
                                 + agent.getDebtRatioOfInvestments() * loanInterestRiskRate;
