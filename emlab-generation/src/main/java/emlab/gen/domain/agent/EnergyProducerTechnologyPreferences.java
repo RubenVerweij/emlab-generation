@@ -22,11 +22,7 @@ import agentspring.simulation.SimulationParameter;
 
 /**
  * @rubenverweij Ruben: this energy producer has a biased investment process due
- *               to specific technology preferences based upon;
- * 
- *               1) Technology preferences based upon company attitude 2)
- *               Technology preferences based upon market share
- * 
+ *               to specific technology preferences based upon diverse criteria;
  */
 
 @NodeEntity
@@ -38,6 +34,24 @@ public class EnergyProducerTechnologyPreferences extends EnergyProducer implemen
     private int weightfactorEfficiency;
     private int weightfactorLifeTime;
     private int weightfactorFuelPrice;
+    private int weigthfactorInvestmentCost;
+    private int weightfactorMinimalRunningHours;
+
+    public int getWeigthfactorInvestmentCost() {
+        return weigthfactorInvestmentCost;
+    }
+
+    public void setWeigthfactorInvestmentCost(int weigthfactorInvestmentCost) {
+        this.weigthfactorInvestmentCost = weigthfactorInvestmentCost;
+    }
+
+    public int getWeightfactorMinimalRunningHours() {
+        return weightfactorMinimalRunningHours;
+    }
+
+    public void setWeightfactorMinimalRunningHours(int weightfactorMinimalRunningHours) {
+        this.weightfactorMinimalRunningHours = weightfactorMinimalRunningHours;
+    }
 
     public int getWeightfactorLifeTime() {
         return weightfactorLifeTime;

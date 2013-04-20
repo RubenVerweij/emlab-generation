@@ -54,9 +54,10 @@ import emlab.gen.util.MapValueComparator;
 
 /**
  * @author Ruben; algorithm extends the current algorithm with technology
- *         preferences based upon market-share and company attitude.
+ *         preferences based upon selection of criteria.
  * 
  */
+
 public class InvestInPowerGenerationTechnologiesWithPreferences<T extends EnergyProducerTechnologyPreferences> extends
         GenericInvestmentRole<T> implements Role<T>, NodeBacked {
 
@@ -121,13 +122,21 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
             PowerGeneratingTechnology bestTechnology = null;
 
             // Variables for MCDA
-            double npvTechnology = Double.MIN_VALUE;
+            double projectValue = Double.MIN_VALUE;
+            double co2Intensity = Double.MIN_VALUE;
+            double investedCapital = Double.MIN_VALUE;
+            double plantlifeTime = Double.MIN_VALUE;
+            double plantrunningHours = Double.MIN_VALUE;
+            double plantEfficiency = Double.MIN_VALUE;
+
+            // Cumulative variable criteria for MCDA
             double npvTotal = Double.MIN_VALUE;
-            double footprintTechnology = Double.MIN_VALUE;
             double footprintTotal = Double.MIN_VALUE;
             double efficiencyTotal = Double.MIN_VALUE;
             double lifetimeTotal = Double.MIN_VALUE;
             double fuelpriceVolatilityTotal = Double.MIN_VALUE;
+            double investmentCostTotal = Double.MIN_VALUE;
+            double minimalRunningHoursTotal = Double.MIN_VALUE;
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
@@ -280,7 +289,7 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                         // + discountedOpProfit,
                         // agent, technology);
 
-                        double projectValue = discountedOpProfit + discountedCapitalCosts;
+                        projectValue = discountedOpProfit + discountedCapitalCosts;
 
                         // logger.warn(
                         // "Agent {}  found the project value for technology {} to be "
@@ -296,23 +305,25 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                         // / (-discountedCapitalCosts);
 
                         //
-                        // calculate cumulative NPV and Footprint per MWh for
-                        // attitude, todo check whether the footprint
-                        // calculation
-                        // could be better?
+                        // calculate cumulative values for calculation of the
+                        // propensity level
                         //
-                        if (projectValue > 0) {
-                            npvTechnology = projectValue;
+
+                        if (projectValue < 0) {
+
+                        } else {
                             npvTotal += projectValue;
+                            efficiencyTotal += plant.getActualEfficiency();
+                            lifetimeTotal += plant.getActualLifetime();
+                            investmentCostTotal = plant.getActualInvestedCapital();
+                            minimalRunningHoursTotal = technology.getMinimumRunningHours();
 
-                            footprintTechnology = technology.getMainFuel().getEnergyDensity()
-                                    * (1 - technology.getCo2CaptureEffciency());
-                            footprintTotal += technology.getMainFuel().getEnergyDensity()
-                                    * (1 - technology.getCo2CaptureEffciency());
+                            investedCapital = plant.getActualInvestedCapital();
+                            plantlifeTime = plant.getActualLifetime();
+                            plantrunningHours = technology.getMinimumRunningHours();
+                            plantEfficiency = plant.getActualEfficiency();
+                            footprintTotal += co2Intensity;
 
-                            // efficiencyTotal += ;
-                            // fuelpriceVolatilityTotal;
-                            // lifetimeTotal += ;
                         }
 
                         /*
@@ -337,26 +348,64 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
 
             // ----------MCDA-------------
 
-            double totalPropensity = Double.MIN_VALUE;
-            double technologyPropensity = Double.MIN_VALUE;
+            double totalPropensity = 0;
+            double technologyPropensity = 0;
+            double highestpropensity = 0;
+            double lowestpropensity = 0;
 
             // calculate propensity / utility
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
-                if (npvTechnology > 0) {
-                    technologyPropensity = agent.getWeightfactorProfit() * npvTechnology / npvTotal
-                            + agent.getWeightfactorEmission() * footprintTechnology / footprintTotal;
+                if (projectValue < 0) {
+
                 } else {
-                    technologyPropensity = 0;
+
+                    technologyPropensity = agent.getWeightfactorProfit() * projectValue / npvTotal
+                            + agent.getWeightfactorEmission() * co2Intensity / footprintTotal
+                            + agent.getWeigthfactorInvestmentCost() + agent.getWeightfactorEfficiency()
+                            * plantEfficiency / efficiencyTotal + agent.getWeigthfactorInvestmentCost()
+                            * investedCapital / investmentCostTotal + agent.getWeightfactorLifeTime()
+                            * plantrunningHours / minimalRunningHoursTotal + agent.getWeightfactorLifeTime()
+                            * plantlifeTime / lifetimeTotal;
                 }
+
+                if (technologyPropensity < highestpropensity && technologyPropensity > lowestpropensity) {
+
+                } else if (technologyPropensity < lowestpropensity) {
+                    technologyPropensity = lowestpropensity;
+
+                } else {
+
+                    technologyPropensity = highestpropensity;
+                }
+
                 totalPropensity += technologyPropensity;
+
+            }
+
+            // normalise propensities
+
+            double totalNormalisedPropensity = Double.MIN_VALUE;
+            double technologyNormalisedPropensity = Double.MIN_VALUE;
+
+            for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
+
+                if (projectValue < 0) {
+
+                } else {
+
+                    technologyNormalisedPropensity = (technologyPropensity - lowestpropensity) * 1
+                            / (highestpropensity - lowestpropensity);
+
+                }
+                totalNormalisedPropensity += technologyNormalisedPropensity;
             }
 
             // calculate probability and add information to lists for discrete
             // distribution
 
-            double technologyProbability = Double.MIN_VALUE;
-            double totalProbability = Double.MIN_VALUE;
+            double technologyProbability = 0;
+            double totalProbability = 0;
 
             // List<String> technologyNamesList = new ArrayList<String>();
             // ArrayList<Double> technologyProbabilitiesList = new
@@ -368,13 +417,19 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
-                // technologyProbability = technologyPropensity /
-                // totalPropensity;
-                // technologyNamesList.add(technology.getName());
+                if (projectValue < 0) {
 
-                technologyNamesArray[i] = technology;
-                technologyProbabilitiesArray[i] = technologyProbability;
-                i++;
+                } else {
+
+                    technologyProbability = technologyNormalisedPropensity / totalNormalisedPropensity;
+                    // totalPropensity;
+                    // technologyNamesList.add(technology.getName());
+
+                    technologyNamesArray[i] = technology;
+                    technologyProbabilitiesArray[i] = technologyProbability;
+                    i++;
+                }
+
                 // verification cumulative probability = 1
                 totalProbability += technologyProbability;
 
@@ -489,6 +544,7 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                 gtr.addData(clearingPoint.getTime(), clearingPoint.getPrice());
             }
             expectedFuelPrices.put(substance, gtr.predict(futureTimePoint));
+
             // logger.warn("Forecast {}: {}, in Step " + futureTimePoint,
             // substance, expectedFuelPrices.get(substance));
         }
@@ -639,7 +695,9 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                 }
 
             }
+
         }
+
     }
 
 }

@@ -271,8 +271,15 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
                                 agent.getAssetValueDeviation(), 2) / 2 * (technology.getDepreciationTime()))
                                 / (agent.getAssetValueDeviation() * Math.sqrt(technology.getDepreciationTime()));
                         double d2 = d1 - agent.getAssetValueDeviation() * Math.sqrt(technology.getDepreciationTime());
-                        double equityValueBS = assetTotal * d1 - debtTotal
-                                * Math.exp(agent.getLoanInterestFreeRate() * technology.getDepreciationTime()) * d2;
+
+                        // outcome to standard normal variable, todo
+
+                        double n1 = d1;
+
+                        double n2 = d2;
+
+                        double equityValueBS = assetTotal * n1 - debtTotal
+                                * Math.exp(agent.getLoanInterestFreeRate() * technology.getDepreciationTime()) * n2;
                         double pricedDebtTotal = assetTotal - equityValueBS;
 
                         // Calcultion of credit-risk interest rate
