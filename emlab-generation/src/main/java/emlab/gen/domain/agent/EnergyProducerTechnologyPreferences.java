@@ -37,6 +37,19 @@ public class EnergyProducerTechnologyPreferences extends EnergyProducer implemen
     private int weigthfactorInvestmentCost;
     private int weightfactorMinimalRunningHours;
 
+    // parameter is needed for normalising the propensity values in the MCDA
+
+    @SimulationParameter(label = "Normalisation parameter for MCDA", from = 1, to = 1.15)
+    private int normalisationParameter;
+
+    public int getNormalisationParameter() {
+        return normalisationParameter;
+    }
+
+    public void setNormalisationParameter(int normalisationParameter) {
+        this.normalisationParameter = normalisationParameter;
+    }
+
     public int getWeigthfactorInvestmentCost() {
         return weigthfactorInvestmentCost;
     }

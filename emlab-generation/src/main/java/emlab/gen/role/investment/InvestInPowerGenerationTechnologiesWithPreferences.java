@@ -138,6 +138,12 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
             double investmentCostTotal = Double.MIN_VALUE;
             double minimalRunningHoursTotal = Double.MIN_VALUE;
 
+            // propensities
+            double totalPropensity = 0;
+            double technologyPropensity = 0;
+            double highestpropensity = 0;
+            double lowestpropensity = 0;
+
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
                 PowerPlant plant = new PowerPlant();
@@ -305,8 +311,9 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                         // / (-discountedCapitalCosts);
 
                         //
-                        // calculate cumulative values for calculation of the
-                        // propensity level
+                        // calculate cumulative MCDA criteria values for
+                        // calculation of the
+                        // propensity
                         //
 
                         if (projectValue < 0) {
@@ -342,20 +349,19 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                 }
             }
 
-            // Now the NPV's are estimated the attitude filter is
-            // added here the propensities are calculated
-            // for the chance of investing in a certain technology
+            // Now the NPV's are estimated and the propensities are calculated
+            // the propensities are normalised and the probabilities are
+            // calculated.
 
             // ----------MCDA-------------
 
-            double totalPropensity = 0;
-            double technologyPropensity = 0;
-            double highestpropensity = 0;
-            double lowestpropensity = 0;
-
-            // calculate propensity / utility
+            // calculate propensity or utility for all with a
+            // NPV > 0 and
+            // determine lowest and highest propensity for
+            // normalisation
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
+
                 if (projectValue < 0) {
 
                 } else {
@@ -367,26 +373,43 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                             * investedCapital / investmentCostTotal + agent.getWeightfactorLifeTime()
                             * plantrunningHours / minimalRunningHoursTotal + agent.getWeightfactorLifeTime()
                             * plantlifeTime / lifetimeTotal;
+
+                    if (technologyPropensity < highestpropensity && technologyPropensity > lowestpropensity) {
+
+                    } else if (technologyPropensity < lowestpropensity) {
+                        technologyPropensity = lowestpropensity;
+
+                    } else {
+
+                        technologyPropensity = highestpropensity;
+                    }
+
+                    totalPropensity += technologyPropensity;
+
                 }
-
-                if (technologyPropensity < highestpropensity && technologyPropensity > lowestpropensity) {
-
-                } else if (technologyPropensity < lowestpropensity) {
-                    technologyPropensity = lowestpropensity;
-
-                } else {
-
-                    technologyPropensity = highestpropensity;
-                }
-
-                totalPropensity += technologyPropensity;
-
             }
 
-            // normalise propensities
+            double totalNormalisedPropensity = 0;
+            double technologyNormalisedPropensity = 0;
 
-            double totalNormalisedPropensity = Double.MIN_VALUE;
-            double technologyNormalisedPropensity = Double.MIN_VALUE;
+            // normalisation parameter in case of negative propensities or equal
+            // to zero, this makes the MCDA more robust
+
+            if (highestpropensity < 0) {
+                highestpropensity = highestpropensity / agent.getNormalisationParameter();
+            } else if (highestpropensity == 0) {
+                highestpropensity = highestpropensity + 1 * agent.getNormalisationParameter();
+            } else {
+                highestpropensity = highestpropensity * agent.getNormalisationParameter();
+            }
+
+            if (lowestpropensity < 0) {
+                highestpropensity = lowestpropensity * agent.getNormalisationParameter();
+            } else if (lowestpropensity == 0) {
+                lowestpropensity = lowestpropensity - 1 * agent.getNormalisationParameter();
+            } else {
+                lowestpropensity = lowestpropensity / agent.getNormalisationParameter();
+            }
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
@@ -398,8 +421,11 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                             / (highestpropensity - lowestpropensity);
 
                 }
+
                 totalNormalisedPropensity += technologyNormalisedPropensity;
             }
+
+            // normalise propensities
 
             // calculate probability and add information to lists for discrete
             // distribution
