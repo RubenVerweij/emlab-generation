@@ -134,7 +134,7 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
             double footprintTotal = Double.MIN_VALUE;
             double efficiencyTotal = Double.MIN_VALUE;
             double lifetimeTotal = Double.MIN_VALUE;
-            double fuelpriceVolatilityTotal = Double.MIN_VALUE;
+            // double fuelpriceVolatilityTotal = Double.MIN_VALUE;
             double investmentCostTotal = Double.MIN_VALUE;
             double minimalRunningHoursTotal = Double.MIN_VALUE;
 
@@ -319,17 +319,19 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                         if (projectValue < 0) {
 
                         } else {
-                            npvTotal += projectValue;
+
+                            npvTotal += projectValue / plant.getActualNominalCapacity();
                             efficiencyTotal += plant.getActualEfficiency();
                             lifetimeTotal += plant.getActualLifetime();
-                            investmentCostTotal = plant.getActualInvestedCapital();
-                            minimalRunningHoursTotal = technology.getMinimumRunningHours();
+                            investmentCostTotal += plant.getActualInvestedCapital();
+                            minimalRunningHoursTotal += technology.getMinimumRunningHours();
+                            footprintTotal += co2Intensity;
 
                             investedCapital = plant.getActualInvestedCapital();
                             plantlifeTime = plant.getActualLifetime();
                             plantrunningHours = technology.getMinimumRunningHours();
                             plantEfficiency = plant.getActualEfficiency();
-                            footprintTotal += co2Intensity;
+                            projectValue = projectValue / plant.getActualNominalCapacity();
 
                         }
 
@@ -367,12 +369,11 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                 } else {
 
                     technologyPropensity = agent.getWeightfactorProfit() * projectValue / npvTotal
-                            + agent.getWeightfactorEmission() * co2Intensity / footprintTotal
-                            + agent.getWeigthfactorInvestmentCost() + agent.getWeightfactorEfficiency()
-                            * plantEfficiency / efficiencyTotal + agent.getWeigthfactorInvestmentCost()
-                            * investedCapital / investmentCostTotal + agent.getWeightfactorLifeTime()
-                            * plantrunningHours / minimalRunningHoursTotal + agent.getWeightfactorLifeTime()
-                            * plantlifeTime / lifetimeTotal;
+                            - agent.getWeightfactorEmission() * co2Intensity / footprintTotal
+                            + agent.getWeightfactorEfficiency() * plantEfficiency / efficiencyTotal
+                            - agent.getWeigthfactorInvestmentCost() * investedCapital / investmentCostTotal
+                            - agent.getWeightfactorMinimalRunningHours() * plantrunningHours / minimalRunningHoursTotal
+                            + agent.getWeightfactorLifeTime() * plantlifeTime / lifetimeTotal;
 
                     if (technologyPropensity < highestpropensity && technologyPropensity > lowestpropensity) {
 
