@@ -21,7 +21,8 @@ import agentspring.agent.Agent;
 import agentspring.simulation.SimulationParameter;
 
 /**
- * @rubenverweij Ruben: this energy producer includes market-share influences
+ * @rubenverweij Ruben: this energy producer includes the variables for the
+ *               debt-pricing model of BS
  * 
  */
 
@@ -38,6 +39,9 @@ public class EnergyProducerCreditRisk extends EnergyProducer implements Agent {
     @SimulationParameter(label = "Asset value path deviation", from = 0, to = 1)
     private double assetValueDeviation;
 
+    @SimulationParameter(label = "Time to maturity BS debt-pricing model", from = 1, to = 15)
+    private double timeToMaturity;
+
     // this debt bias is modelled to test the black-scholes debt pricing model
     // in a market with more debt than 100 percent of the total asset value.
     // This implies that companies are required to borrow money against higher
@@ -45,6 +49,14 @@ public class EnergyProducerCreditRisk extends EnergyProducer implements Agent {
 
     @SimulationParameter(label = "Additional debt", from = 0, to = 1e8)
     private double debtBias;
+
+    public double getTimeToMaturity() {
+        return timeToMaturity;
+    }
+
+    public void setTimeToMaturity(double timeToMaturity) {
+        this.timeToMaturity = timeToMaturity;
+    }
 
     public double getDebtBias() {
         return debtBias;

@@ -281,25 +281,27 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
                         assetTotal = agent.getCash() + assetPlantTotal;
 
                         double d1 = (Math.log(assetTotal / debtTotal) + agent.getLoanInterestFreeRate() + Math.pow(
-                                agent.getAssetValueDeviation(), 2) / 2 * (technology.getDepreciationTime()))
-                                / (agent.getAssetValueDeviation() * Math.sqrt(technology.getDepreciationTime()));
-                        double d2 = d1 - agent.getAssetValueDeviation() * Math.sqrt(technology.getDepreciationTime());
+                                agent.getAssetValueDeviation(), 2) / 2 * (agent.getTimeToMaturity()))
+                                / (agent.getAssetValueDeviation() * Math.sqrt(agent.getTimeToMaturity()));
 
-                        // TODO outcome to standard normal variable
+                        double d2 = d1 - agent.getAssetValueDeviation() * Math.sqrt(agent.getTimeToMaturity());
+
+                        // TODO outcome to standard normal variable n1(d1) and
+                        // n2(d2)
 
                         double n1 = d1;
 
                         double n2 = d2;
 
                         double equityValueBS = assetTotal * n1 - debtTotal
-                                * Math.exp(agent.getLoanInterestFreeRate() * technology.getDepreciationTime()) * n2;
+                                * Math.exp(agent.getLoanInterestFreeRate() * agent.getTimeToMaturity()) * n2;
                         double pricedDebtTotal = assetTotal - equityValueBS;
 
-                        // Calcultion of credit-risk interest rate
-                        double loanInterestRiskRate = -1 / technology.getDepreciationTime()
+                        // Calculation of credit-risk interest rate
+                        double loanInterestRiskRate = -1 / agent.getTimeToMaturity()
                                 * Math.log(pricedDebtTotal / debtTotal);
 
-                        // Determination to accept yes or no?
+                        // Determination to accept yes or no? this might not.
 
                         double wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
                                 + agent.getDebtRatioOfInvestments() * loanInterestRiskRate;
