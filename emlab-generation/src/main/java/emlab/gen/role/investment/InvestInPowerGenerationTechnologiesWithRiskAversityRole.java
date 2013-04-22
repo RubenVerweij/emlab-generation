@@ -120,6 +120,7 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
             // + futureTimePoint + " in Market " + market);
 
             double highestValue = Double.MIN_VALUE;
+            double projectValue = Double.MIN_VALUE;
             PowerGeneratingTechnology bestTechnology = null;
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
@@ -245,7 +246,7 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
                         // value
 
                         String substance = technology.getMainFuel().getName();
-                        double wacc = Double.MIN_VALUE;
+                        double wacc = 0;
 
                         if (substance == "Uranium") {
 
@@ -303,7 +304,7 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
                         // + discountedOpProfit,
                         // agent, technology);
 
-                        double projectValue = discountedOpProfit + discountedCapitalCosts;
+                        projectValue = discountedOpProfit + discountedCapitalCosts;
 
                         // logger.warn(
                         // "Agent {}  found the project value for technology {} to be "
@@ -326,6 +327,7 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
                         if (projectValue > 0 && projectValue / plant.getActualNominalCapacity() > highestValue) {
                             highestValue = projectValue / plant.getActualNominalCapacity();
                             bestTechnology = plant.getTechnology();
+
                         }
                     }
 

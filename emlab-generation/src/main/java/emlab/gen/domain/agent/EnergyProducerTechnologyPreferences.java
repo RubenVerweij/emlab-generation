@@ -40,13 +40,13 @@ public class EnergyProducerTechnologyPreferences extends EnergyProducer implemen
     // parameter is needed for normalising the propensity values in the MCDA
 
     @SimulationParameter(label = "Normalisation parameter for MCDA", from = 1, to = 1.15)
-    private int normalisationParameter;
+    private double normalisationParameter;
 
-    public int getNormalisationParameter() {
+    public double getNormalisationParameter() {
         return normalisationParameter;
     }
 
-    public void setNormalisationParameter(int normalisationParameter) {
+    public void setNormalisationParameter(double normalisationParameter) {
         this.normalisationParameter = normalisationParameter;
     }
 

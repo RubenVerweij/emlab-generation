@@ -53,10 +53,9 @@ import emlab.gen.util.GeometricTrendRegression;
 import emlab.gen.util.MapValueComparator;
 
 /**
- * @author Ruben; algorithm extends the current algorithm with market-share
- *         influences
+ * @author Ruben; algorithm extends the current algorithm with a credit risk
+ *         consideration
  * 
- *         1. includes credit-risk
  * 
  */
 
@@ -280,21 +279,21 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
                         double assetTotal = Double.MIN_VALUE;
                         assetTotal = agent.getCash() + assetPlantTotal;
 
-                        double d1 = (Math.log(assetTotal / debtTotal) + agent.getLoanInterestFreeRate() + Math.pow(
-                                agent.getAssetValueDeviation(), 2) / 2 * (agent.getTimeToMaturity()))
+                        double d1 = (Math.log(assetTotal / debtTotal) + (agent.getLoanInterestFreeRate() + Math.pow(
+                                agent.getAssetValueDeviation(), 2) / 2) * (agent.getTimeToMaturity()))
                                 / (agent.getAssetValueDeviation() * Math.sqrt(agent.getTimeToMaturity()));
 
                         double d2 = d1 - agent.getAssetValueDeviation() * Math.sqrt(agent.getTimeToMaturity());
 
                         // TODO outcome to standard normal variable n1(d1) and
-                        // n2(d2)
+                        // n2(d2) using Taylor approximation
 
-                        double n1 = d1;
+                        double n1 = cumulativeNormalDistributionFunction(d1);
+                        double n2 = cumulativeNormalDistributionFunction(d2);
 
-                        double n2 = d2;
-
-                        double equityValueBS = assetTotal * n1 - debtTotal
-                                * Math.exp(agent.getLoanInterestFreeRate() * agent.getTimeToMaturity()) * n2;
+                        double equityValueBS = (assetTotal * n1)
+                                - (debtTotal * Math.exp(-agent.getLoanInterestFreeRate() * agent.getTimeToMaturity()))
+                                * n2;
                         double pricedDebtTotal = assetTotal - equityValueBS;
 
                         // Calculation of credit-risk interest rate
@@ -410,6 +409,21 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
     @Transactional
     private void setNotWillingToInvest(EnergyProducer agent) {
         agent.setWillingToInvest(false);
+    }
+
+    // returns the cumulative normal distribution function (CNDF)
+    // for a standard normal: N(0,1) required for BS debt pricing model
+
+    static double cumulativeNormalDistributionFunction(double x) {
+        int neg = (x < 0d) ? 1 : 0;
+        if (neg == 1)
+            x *= -1d;
+
+        double k = (1d / (1d + 0.2316419 * x));
+        double y = ((((1.330274429 * k - 1.821255978) * k + 1.781477937) * k - 0.356563782) * k + 0.319381530) * k;
+        y = 1.0 - 0.398942280401 * Math.exp(-0.5 * x * x) * y;
+
+        return (1d - neg) * y + neg * (1d - y);
     }
 
     /**
