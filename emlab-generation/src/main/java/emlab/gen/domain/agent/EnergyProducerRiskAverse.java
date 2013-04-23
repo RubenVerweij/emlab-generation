@@ -23,8 +23,8 @@ import agentspring.simulation.SimulationParameter;
 /**
  * @rubenverweij Ruben: this energy producer includes risk averse behaviour
  * 
- * 
- * 
+ *               1. specific risk averse gedrag 2. diversifying or progressive
+ *               gedrag
  */
 
 @NodeEntity
@@ -35,20 +35,49 @@ public class EnergyProducerRiskAverse extends EnergyProducer implements Agent {
     // EnergyProducerCreditRisk energyProducerCreditRisk;
 
     // agent is risk averse / taker for particular technologies
+    private boolean specificRiskAverse;
+
     @SimulationParameter(label = "Risk premium technology", from = -0.05, to = 0.05)
     private double riskPremiumNuclear;
     private double riskPremiumCoal;
     private double riskPremiumGas;
     private double riskPremiumRenewable;
 
+    // agent tend to invest in
+    private boolean diversificationProfile;
+
     // agent tends to invest in conventional technologies
     private boolean conservativenessRiskProfile;
 
-    // agent tends to diversify technologies
-    private boolean progressivenessRiskProfile;
-
     // agent tends to follow popular technologies
     private boolean followersProfile;
+
+    // Border where a investor is considered a giant
+    private double marketGiantCapacity;
+
+    public double getMarketGiantCapacity() {
+        return marketGiantCapacity;
+    }
+
+    public void setMarketGiantCapacity(double marketGiantCapacity) {
+        this.marketGiantCapacity = marketGiantCapacity;
+    }
+
+    public boolean isDiversificationProfile() {
+        return diversificationProfile;
+    }
+
+    public void setDiversificationProfile(boolean diversificationProfile) {
+        this.diversificationProfile = diversificationProfile;
+    }
+
+    public boolean isSpecificRiskAverse() {
+        return specificRiskAverse;
+    }
+
+    public void setSpecificRiskAverse(boolean specificRiskAverse) {
+        this.specificRiskAverse = specificRiskAverse;
+    }
 
     public double getRiskPremiumNuclear() {
         return riskPremiumNuclear;
@@ -88,14 +117,6 @@ public class EnergyProducerRiskAverse extends EnergyProducer implements Agent {
 
     public void setConservativenessRiskProfile(boolean conservativenessRiskProfile) {
         this.conservativenessRiskProfile = conservativenessRiskProfile;
-    }
-
-    public boolean isProgressivenessRiskProfile() {
-        return progressivenessRiskProfile;
-    }
-
-    public void setProgressivenessRiskProfile(boolean progressivenessRiskProfile) {
-        this.progressivenessRiskProfile = progressivenessRiskProfile;
     }
 
     public boolean isFollowersProfile() {
