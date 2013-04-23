@@ -120,6 +120,7 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
         if (agent.getDebtBias() == 0) {
 
         } else {
+
             debtTotal = debtTotal + agent.getDebtBias();
         }
 
@@ -276,8 +277,7 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
                         // a
                         // higher debt rate offer
 
-                        double assetTotal = Double.MIN_VALUE;
-                        assetTotal = agent.getCash() + assetPlantTotal;
+                        double assetTotal = agent.getCash() + assetPlantTotal;
 
                         double d1 = (Math.log(assetTotal / debtTotal) + (agent.getLoanInterestFreeRate() + Math.pow(
                                 agent.getAssetValueDeviation(), 2) / 2) * (agent.getTimeToMaturity()))

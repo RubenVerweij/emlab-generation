@@ -118,31 +118,22 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
             // expectedCO2Price.get(market) + " Euro/MWh at timepoint "
             // + futureTimePoint + " in Market " + market);
 
-            double highestValue = Double.MIN_VALUE;
+            // double highestValue = Double.MIN_VALUE;
             PowerGeneratingTechnology bestTechnology = null;
 
             // Variables for MCDA
-            double projectValue = Double.MIN_VALUE;
-            double co2Intensity = Double.MIN_VALUE;
-            double investedCapital = Double.MIN_VALUE;
-            double plantlifeTime = Double.MIN_VALUE;
-            double plantrunningHours = Double.MIN_VALUE;
-            double plantEfficiency = Double.MIN_VALUE;
-
             // Cumulative variable criteria for MCDA
-            double npvTotal = Double.MIN_VALUE;
-            double footprintTotal = Double.MIN_VALUE;
-            double efficiencyTotal = Double.MIN_VALUE;
-            double lifetimeTotal = Double.MIN_VALUE;
+            double npvTotal = 0d;
+            double footprintTotal = 0d;
+            double efficiencyTotal = 0d;
+            double lifetimeTotal = 0d;
+            double investmentCostTotal = 0d;
+            double minimalRunningHoursTotal = 0d;
             // double fuelpriceVolatilityTotal = Double.MIN_VALUE;
-            double investmentCostTotal = Double.MIN_VALUE;
-            double minimalRunningHoursTotal = Double.MIN_VALUE;
 
             // propensities
-            double totalPropensity = 0;
-            double technologyPropensity = 0;
-            double highestpropensity = 0;
-            double lowestpropensity = 0;
+            double highestpropensity = 0d;
+            double lowestpropensity = 0d;
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
@@ -295,7 +286,7 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                         // + discountedOpProfit,
                         // agent, technology);
 
-                        projectValue = discountedOpProfit + discountedCapitalCosts;
+                        technology.setProjectValue(discountedOpProfit + discountedCapitalCosts);
 
                         // logger.warn(
                         // "Agent {}  found the project value for technology {} to be "
@@ -316,22 +307,16 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                         // propensity
                         //
 
-                        if (projectValue < 0) {
+                        if (technology.getProjectValue() < 0) {
 
                         } else {
 
-                            npvTotal += projectValue / plant.getActualNominalCapacity();
+                            npvTotal += technology.getProjectValue() / plant.getActualNominalCapacity();
                             efficiencyTotal += plant.getActualEfficiency();
                             lifetimeTotal += plant.getActualLifetime();
                             investmentCostTotal += plant.getActualInvestedCapital();
                             minimalRunningHoursTotal += technology.getMinimumRunningHours();
-                            footprintTotal += co2Intensity;
-
-                            investedCapital = plant.getActualInvestedCapital();
-                            plantlifeTime = plant.getActualLifetime();
-                            plantrunningHours = technology.getMinimumRunningHours();
-                            plantEfficiency = plant.getActualEfficiency();
-                            projectValue = projectValue / plant.getActualNominalCapacity();
+                            footprintTotal += plant.calculateEmissionIntensity();
 
                         }
 
@@ -362,36 +347,44 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
             // determine lowest and highest propensity for
             // normalisation
 
+            double totalPropensity = 0d;
+
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
-                if (projectValue < 0) {
+                PowerPlant plant = new PowerPlant();
+                plant.specifyNotPersist(getCurrentTick(), agent, getNodeForZone(market.getZone()), technology);
+
+                if (technology.getProjectValue() < 0) {
 
                 } else {
 
-                    technologyPropensity = agent.getWeightfactorProfit() * projectValue / npvTotal
-                            - agent.getWeightfactorEmission() * co2Intensity / footprintTotal
-                            + agent.getWeightfactorEfficiency() * plantEfficiency / efficiencyTotal
-                            - agent.getWeigthfactorInvestmentCost() * investedCapital / investmentCostTotal
-                            - agent.getWeightfactorMinimalRunningHours() * plantrunningHours / minimalRunningHoursTotal
-                            + agent.getWeightfactorLifeTime() * plantlifeTime / lifetimeTotal;
+                    technology.setTechnologyPropensity(agent.getWeightfactorProfit() * technology.getProjectValue()
+                            / plant.getActualNominalCapacity() / npvTotal - agent.getWeightfactorEmission()
+                            * plant.calculateEmissionIntensity() / footprintTotal + agent.getWeightfactorEfficiency()
+                            * plant.getActualEfficiency() / efficiencyTotal - agent.getWeigthfactorInvestmentCost()
+                            * plant.getActualInvestedCapital() / investmentCostTotal
+                            - agent.getWeightfactorMinimalRunningHours() * technology.getMinimumRunningHours()
+                            / minimalRunningHoursTotal + agent.getWeightfactorLifeTime() * plant.getActualLifetime()
+                            / lifetimeTotal);
 
-                    if (technologyPropensity < highestpropensity && technologyPropensity > lowestpropensity) {
+                    if (technology.getTechnologyPropensity() < highestpropensity
+                            && technology.getTechnologyPropensity() > lowestpropensity) {
 
-                    } else if (technologyPropensity < lowestpropensity) {
-                        technologyPropensity = lowestpropensity;
+                    } else if (technology.getTechnologyPropensity() < lowestpropensity) {
+                        lowestpropensity = technology.getTechnologyPropensity();
 
                     } else {
 
-                        technologyPropensity = highestpropensity;
+                        highestpropensity = technology.getTechnologyPropensity();
                     }
 
-                    totalPropensity += technologyPropensity;
-
                 }
+
+                totalPropensity += technology.getTechnologyPropensity();
+
             }
 
             double totalNormalisedPropensity = 0;
-            double technologyNormalisedPropensity = 0;
 
             // normalisation parameter in case of negative propensities or equal
             // to zero, this makes the MCDA more robust
@@ -414,16 +407,20 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
-                if (projectValue < 0) {
+                PowerPlant plant = new PowerPlant();
+                plant.specifyNotPersist(getCurrentTick(), agent, getNodeForZone(market.getZone()), technology);
+
+                if (technology.getProjectValue() < 0) {
 
                 } else {
 
-                    technologyNormalisedPropensity = (technologyPropensity - lowestpropensity) * 1
-                            / (highestpropensity - lowestpropensity);
+                    technology
+                            .setTechnologyNormalisedPropensity((technology.getTechnologyPropensity() - lowestpropensity)
+                                    * 1 / (highestpropensity - lowestpropensity));
 
                 }
 
-                totalNormalisedPropensity += technologyNormalisedPropensity;
+                totalNormalisedPropensity += technology.getTechnologyNormalisedPropensity();
             }
 
             // normalise propensities
@@ -431,7 +428,6 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
             // calculate probability and add information to lists for discrete
             // distribution
 
-            double technologyProbability = 0;
             double totalProbability = 0;
 
             // List<String> technologyNamesList = new ArrayList<String>();
@@ -444,21 +440,23 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
-                if (projectValue < 0) {
+                if (technology.getProjectValue() < 0) {
 
                 } else {
 
-                    technologyProbability = technologyNormalisedPropensity / totalNormalisedPropensity;
+                    technology.setTechnologyProbability(technology.getTechnologyNormalisedPropensity()
+                            / totalNormalisedPropensity);
+
                     // totalPropensity;
                     // technologyNamesList.add(technology.getName());
 
                     technologyNamesArray[i] = technology;
-                    technologyProbabilitiesArray[i] = technologyProbability;
+                    technologyProbabilitiesArray[i] = technology.getTechnologyProbability();
                     i++;
                 }
 
                 // verification cumulative probability = 1
-                totalProbability += technologyProbability;
+                totalProbability += technology.getTechnologyProbability();
 
             }
 

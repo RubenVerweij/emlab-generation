@@ -76,7 +76,11 @@ public class PowerGeneratingTechnology {
 
     private boolean intermittent;
 
+    // MCDA variables
     private double projectValue;
+    private double technologyPropensity;
+    private double technologyNormalisedPropensity;
+    private double technologyProbability;
 
     public double getProjectValue() {
         return projectValue;
@@ -84,6 +88,30 @@ public class PowerGeneratingTechnology {
 
     public void setProjectValue(double projectValue) {
         this.projectValue = projectValue;
+    }
+
+    public double getTechnologyPropensity() {
+        return technologyPropensity;
+    }
+
+    public void setTechnologyPropensity(double technologyPropensity) {
+        this.technologyPropensity = technologyPropensity;
+    }
+
+    public double getTechnologyNormalisedPropensity() {
+        return technologyNormalisedPropensity;
+    }
+
+    public void setTechnologyNormalisedPropensity(double technologyNormalisedPropensity) {
+        this.technologyNormalisedPropensity = technologyNormalisedPropensity;
+    }
+
+    public double getTechnologyProbability() {
+        return technologyProbability;
+    }
+
+    public void setTechnologyProbability(double technologyProbability) {
+        this.technologyProbability = technologyProbability;
     }
 
     public double getBaseSegmentDependentAvailability() {
