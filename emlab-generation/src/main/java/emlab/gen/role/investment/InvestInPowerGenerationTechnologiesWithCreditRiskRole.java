@@ -305,6 +305,9 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
                         double wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
                                 + agent.getDebtRatioOfInvestments() * loanInterestRiskRate;
 
+                        logger.warn(agent + " gets a debt-rate offer of " + loanInterestRiskRate + " % at timepoint "
+                                + futureTimePoint + " in Market " + market);
+
                         // Creation of out cash-flow during power plant building
                         // phase (note that the cash-flow is negative!)
                         TreeMap<Integer, Double> discountedProjectCapitalOutflow = calculateSimplePowerPlantInvestmentCashFlow(
