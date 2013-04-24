@@ -413,6 +413,7 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
             }
 
             double totalNormalisedPropensity = 0;
+            int numberProfitableProjects = 0;
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
@@ -422,6 +423,8 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
                 if (technology.getProjectValue() < 0) {
 
                 } else {
+
+                    numberProfitableProjects += 1;
 
                     technology.setTechnologyNormalisedPropensity((technology.getTechnologyPropensity() - lowestShare)
                             * 1 / (highestShare - lowestShare));
@@ -433,8 +436,8 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
 
             double totalProbability = 0;
 
-            PowerGeneratingTechnology[] technologyNamesArray = new PowerGeneratingTechnology[0];
-            double[] technologyProbabilitiesArray = new double[0];
+            PowerGeneratingTechnology[] technologyNamesArray = new PowerGeneratingTechnology[numberProfitableProjects];
+            double[] technologyProbabilitiesArray = new double[numberProfitableProjects];
             int i = 0;
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {

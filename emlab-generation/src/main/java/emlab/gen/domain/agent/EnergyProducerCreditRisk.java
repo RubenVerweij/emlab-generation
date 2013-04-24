@@ -21,9 +21,8 @@ import agentspring.agent.Agent;
 import agentspring.simulation.SimulationParameter;
 
 /**
- * @rubenverweij Ruben: this energy producer includes the variables for the
- *               debt-pricing model of BS
- * 
+ * @rubenverweij Ruben: this energy producer includes credit-risk considerations
+ *               depending on the financial structure.
  */
 
 @NodeEntity

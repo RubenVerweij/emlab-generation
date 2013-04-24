@@ -405,6 +405,8 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                 lowestpropensity = lowestpropensity / agent.getNormalisationParameter();
             }
 
+            int numberProfitableProjects = 0;
+
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
                 PowerPlant plant = new PowerPlant();
@@ -413,6 +415,8 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
                 if (technology.getProjectValue() < 0) {
 
                 } else {
+
+                    numberProfitableProjects += 1;
 
                     technology
                             .setTechnologyNormalisedPropensity((technology.getTechnologyPropensity() - lowestpropensity)
@@ -434,8 +438,8 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
             // ArrayList<Double> technologyProbabilitiesList = new
             // ArrayList<Double>();
 
-            PowerGeneratingTechnology[] technologyNamesArray = new PowerGeneratingTechnology[0];
-            double[] technologyProbabilitiesArray = new double[0];
+            PowerGeneratingTechnology[] technologyNamesArray = new PowerGeneratingTechnology[numberProfitableProjects];
+            double[] technologyProbabilitiesArray = new double[numberProfitableProjects];
             int i = 0;
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {

@@ -23,8 +23,8 @@ import agentspring.simulation.SimulationParameter;
 /**
  * @rubenverweij Ruben: this energy producer includes risk averse behaviour
  * 
- *               1. specific risk averse gedrag 2. diversifying or progressive
- *               gedrag
+ *               1. specific risk averse behaviour 2. diversifying conservative
+ *               behaviour
  */
 
 @NodeEntity

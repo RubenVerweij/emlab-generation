@@ -45,16 +45,17 @@ import emlab.gen.trend.GeometricTrend;
 import emlab.gen.trend.StepTrend;
 
 /**
- * @author Ruben J-unit test for investment role with technology preferences
+ * @author Ruben J-unit test for investment role with a credit-risk
+ *         consideration
  * 
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({ "/emlab-gen-test-context.xml" })
 @Transactional
-public class InvestInPowerGenerationTechnologiesWithPreferencesTest {
+public class InvestInPowerGenerationTechnologiesWithCreditRiskRoleTest {
 
-    Logger logger = Logger.getLogger(InvestInPowerGenerationTechnologiesWithPreferencesTest.class);
+    Logger logger = Logger.getLogger(InvestInPowerGenerationTechnologiesWithCreditRiskRoleTest.class);
 
     @Autowired
     PowerPlantRepository powerPlantRepository;
@@ -313,5 +314,4 @@ public class InvestInPowerGenerationTechnologiesWithPreferencesTest {
         double peakPowerPlantCapacity = powerPlantRepository.calculatePeakCapacityOfOperationalPowerPlants(0);
         assertEquals("Test if peakCapacity queries work: ", 620, peakPowerPlantCapacity, 0.1);
     }
-
 }

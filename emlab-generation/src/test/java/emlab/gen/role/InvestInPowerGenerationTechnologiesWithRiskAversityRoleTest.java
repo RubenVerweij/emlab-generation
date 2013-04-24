@@ -30,7 +30,7 @@ import emlab.gen.repository.PowerPlantRepository;
 import emlab.gen.role.investment.GenericInvestmentRole;
 
 /**
- * @author Ruben
+ * @author Ruben J-unit test for investment role with risk-averse behaviour
  * 
  */
 

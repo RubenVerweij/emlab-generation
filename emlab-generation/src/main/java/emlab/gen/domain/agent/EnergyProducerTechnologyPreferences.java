@@ -22,7 +22,7 @@ import agentspring.simulation.SimulationParameter;
 
 /**
  * @rubenverweij Ruben: this energy producer has a biased investment process due
- *               to specific technology preferences based upon diverse criteria;
+ *               to specific technology preferences based upon various criteria;
  */
 
 @NodeEntity
