@@ -55,6 +55,20 @@ public class EnergyProducerRiskAverse extends EnergyProducer implements Agent {
     // Border where a investor is considered a giant
     private double marketGiantCapacity;
 
+    // parameter is needed for normalising the propensity values in the
+    // portfolio diversification
+
+    @SimulationParameter(label = "Normalisation parameter for MCDA", from = 1, to = 1.15)
+    private double normalisationParameter;
+
+    public double getNormalisationParameter() {
+        return normalisationParameter;
+    }
+
+    public void setNormalisationParameter(double normalisationParameter) {
+        this.normalisationParameter = normalisationParameter;
+    }
+
     public double getMarketGiantCapacity() {
         return marketGiantCapacity;
     }

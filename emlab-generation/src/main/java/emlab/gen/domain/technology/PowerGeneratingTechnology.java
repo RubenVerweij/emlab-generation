@@ -83,8 +83,17 @@ public class PowerGeneratingTechnology {
     private double technologyProbability;
 
     // Portfolio variables
+    private double technologyCapacityShareInvestor;
     private double technologyNormalisedTechnologyShare;
     private double technologyProbabilityTechnologyShare;
+
+    public double getTechnologyCapacityShareInvestor() {
+        return technologyCapacityShareInvestor;
+    }
+
+    public void setTechnologyCapacityShareInvestor(double technologyCapacityShareInvestor) {
+        this.technologyCapacityShareInvestor = technologyCapacityShareInvestor;
+    }
 
     public double getTechnologyNormalisedTechnologyShare() {
         return technologyNormalisedTechnologyShare;
