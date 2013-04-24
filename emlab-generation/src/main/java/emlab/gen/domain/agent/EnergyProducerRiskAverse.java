@@ -58,7 +58,7 @@ public class EnergyProducerRiskAverse extends EnergyProducer implements Agent {
     // parameter is needed for normalising the propensity values in the
     // portfolio diversification
 
-    @SimulationParameter(label = "Normalisation parameter for MCDA", from = 1, to = 1.15)
+    @SimulationParameter(label = "Normalisation parameter for technology shares", from = 1, to = 1.15)
     private double normalisationParameter;
 
     public double getNormalisationParameter() {
