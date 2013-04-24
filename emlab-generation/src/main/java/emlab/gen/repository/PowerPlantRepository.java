@@ -234,41 +234,46 @@ public interface PowerPlantRepository extends GraphRepository<PowerPlant> {
     public double calculateCapacityOfPowerPlantsByTechnologyInPipeline(
             @Param("tech") PowerGeneratingTechnology technology, @Param("tick") long tick);
 
-    /*
-     * Some extra queries for the risk-averse behaviour algorithm
-     */
+    // Some extra queries for the risk-averse behaviour algorithm
 
     // calculation of capacity/market/owner
 
     @Query(value = "result = g.v(market).out('ZONE').in('REGION').in('LOCATION').filter{it.__type__=='emlab.gen.domain.technology.PowerPlant'}.out('POWERPLANT_OWNER').filter{it==g.v(owner)}.in('POWERPLANT_OWNER').filter{((it.constructionStartTime + it.actualPermittime + it.actualLeadtime) <= tick)}.sum{it.actualNominalCapacity};"
             + "if(result == null){return 0} else{return result}", type = QueryType.Gremlin)
     public double calculateCapacityOfOperationalPowerPlantsInMarketByOwner(
-            @Param("market") ElectricitySpotMarket market, @Param("tick") long tick,
-            @Param("owner") EnergyProducer owner);
+
+    @Param("market") ElectricitySpotMarket market, @Param("tick") long tick,
+
+    @Param("owner") EnergyProducer owner);
 
     // calculation of capacity/technology/owner
 
     @Query(value = "result = g.v(tech).as('x').in('TECHNOLOGY').filter{it.__type__=='emlab.gen.domain.technology.PowerPlant'}.out('POWERPLANT_OWNER').filter{it==g.v(owner)}.in('POWERPLANT_OWNER').filter{(it.dismantleTime > tick) && ((it.constructionStartTime + it.actualPermittime + it.actualLeadtime) <= tick)}.sum{it.actualNominalCapacity};"
             + "if(result == null){return 0;} else{return result;}", type = QueryType.Gremlin)
     double calculateCapacityOfOperationalPowerPlantsByTechnologyByOwner(
-            @Param("tech") PowerGeneratingTechnology technology, @Param("tick") long tick,
-            @Param("owner") EnergyProducer owner);
+
+    @Param("tech") PowerGeneratingTechnology technology, @Param("tick") long tick,
+
+    @Param("owner") EnergyProducer owner);
 
     // calculation of capacity/owner
 
     @Query(value = "g.idx('__types__')[[className:'emlab.gen.domain.technology.PowerPlant']].out('POWERPLANT_OWNER').filter{it==g.v(owner)}.in('POWERPLANT_OWNER').filter{(it.dismantleTime > tick) && ((it.constructionStartTime + it.actualPermittime + it.actualLeadtime) <= tick)}.sum{it.actualNominalCapacity};", type = QueryType.Gremlin)
     public double calculateCapacityOfOperationalPowerPlantsByOwner(@Param("tick") long tick,
-            @Param("owner") EnergyProducer owner);
+
+    @Param("owner") EnergyProducer owner);
 
     // calculation of the capacity/market/owner/technology
 
     @Query(value = "result = g.v(market).out('ZONE').in('REGION').in('LOCATION').filter{it.__type__=='emlab.gen.domain.technology.PowerPlant'}.out('POWERPLANT_OWNER').filter{it==g.v(owner)}.in('POWERPLANT_OWNER').filter{((it.constructionStartTime + it.actualPermittime + it.actualLeadtime) <= tick)}.as('x').out('TECHNOLOGY').filter{it==g.v(tech)}.back('x').sum{it.actualNominalCapacity};"
             + "if(result == null){return 0} else{return result}", type = QueryType.Gremlin)
     public double calculateCapacityOfOperationalPowerPlantsInMarketByOwnerAndTechnology(
-            @Param("market") ElectricitySpotMarket market, @Param("tech") PowerGeneratingTechnology technology,
-            @Param("tick") long tick, @Param("owner") EnergyProducer owner);
 
-    // the query above is the last of the queries belonging to risk-averse
+    @Param("market") ElectricitySpotMarket market, @Param("tech") PowerGeneratingTechnology technology,
+
+    @Param("tick") long tick, @Param("owner") EnergyProducer owner);
+
+    // the query above is the last of the queries belonging to risk-averse //
     // behaviour
 
 }
