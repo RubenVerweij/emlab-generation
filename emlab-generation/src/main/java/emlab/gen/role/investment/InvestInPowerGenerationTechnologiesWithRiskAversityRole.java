@@ -376,19 +376,18 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
                 PowerPlant plant = new PowerPlant();
-                plant.specifyAndPersist(getCurrentTick(), agent, getNodeForZone(market.getZone()), bestTechnology);
 
                 if (technology.getProjectValue() > 0) {
 
                     if (technology.getTechnologyCapacityShareInvestor() < highestShare
-                            && technology.getTechnologyPropensity() > lowestShare) {
+                            && technology.getTechnologyCapacityShareInvestor() > lowestShare) {
 
                     } else if (technology.getTechnologyPropensity() < lowestShare) {
-                        lowestShare = technology.getTechnologyPropensity();
+                        lowestShare = technology.getTechnologyCapacityShareInvestor();
 
                     } else {
 
-                        highestShare = technology.getTechnologyPropensity();
+                        highestShare = technology.getTechnologyCapacityShareInvestor();
                     }
 
                     if (highestShare < 0) {
@@ -407,18 +406,15 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
                         lowestShare = lowestShare / agent.getNormalisationParameter();
                     }
 
-                    bestTechnology = plant.getTechnology();
-
                 }
             }
 
-            double totalNormalisedPropensity = 0;
+            double totalTechnologyNormalisedTechnologyShare = 0;
             int numberProfitableProjects = 0;
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
                 PowerPlant plant = new PowerPlant();
-                plant.specifyNotPersist(getCurrentTick(), agent, getNodeForZone(market.getZone()), technology);
 
                 if (technology.getProjectValue() < 0) {
 
@@ -426,15 +422,16 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
 
                     numberProfitableProjects += 1;
 
-                    technology.setTechnologyNormalisedPropensity((technology.getTechnologyPropensity() - lowestShare)
-                            * 1 / (highestShare - lowestShare));
+                    technology
+                            .setTechnologyNormalisedTechnologyShare((technology.getTechnologyCapacityShareInvestor() - lowestShare)
+                                    * 1 / (highestShare - lowestShare));
 
                 }
 
-                totalNormalisedPropensity += technology.getTechnologyNormalisedPropensity();
+                totalTechnologyNormalisedTechnologyShare += technology.getTechnologyNormalisedTechnologyShare();
             }
 
-            double totalProbability = 0;
+            double totalTechnologyProbabilityTechnologyShare = 0;
 
             PowerGeneratingTechnology[] technologyNamesArray = new PowerGeneratingTechnology[numberProfitableProjects];
             double[] technologyProbabilitiesArray = new double[numberProfitableProjects];
@@ -446,19 +443,19 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
 
                 } else {
 
-                    technology.setTechnologyProbability((1 - technology.getTechnologyNormalisedPropensity())
-                            / totalNormalisedPropensity);
+                    technology.setTechnologyProbabilityTechnologyShare((1 - technology
+                            .getTechnologyNormalisedTechnologyShare()) / totalTechnologyNormalisedTechnologyShare);
 
                     // totalPropensity;
                     // technologyNamesList.add(technology.getName());
 
                     technologyNamesArray[i] = technology;
-                    technologyProbabilitiesArray[i] = technology.getTechnologyProbability();
+                    technologyProbabilitiesArray[i] = technology.getTechnologyProbabilityTechnologyShare();
                     i++;
                 }
 
                 // verification cumulative probability = 1
-                totalProbability += technology.getTechnologyProbability();
+                totalTechnologyNormalisedTechnologyShare += technology.getTechnologyProbabilityTechnologyShare();
 
             }
 
