@@ -110,10 +110,11 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
         double assetPlantTotal = 0;
 
         for (PowerPlant plant : reps.powerPlantRepository.findPowerPlantsByOwner(agent)) {
-            debtTotal += plant.getLoan().getTotalNumberOfPayments() * plant.getLoan().getAmountPerPayment()
-                    - plant.getLoan().getNumberOfPaymentsDone() * plant.getLoan().getAmountPerPayment();
-            assetPlantTotal += plant.getActualInvestedCapital() - plant.getActualInvestedCapital()
-                    / plant.getTechnology().getDepreciationTime() * plant.getLoan().getNumberOfPaymentsDone();
+            debtTotal += (plant.getLoan().getTotalNumberOfPayments() * plant.getLoan().getAmountPerPayment())
+                    - (plant.getLoan().getNumberOfPaymentsDone() * plant.getLoan().getAmountPerPayment());
+            assetPlantTotal += plant.getTechnology().getInitialValueTechnology()
+                    - (plant.getTechnology().getInitialValueTechnology() / plant.getTechnology().getDepreciationTime() * plant
+                            .getLoan().getNumberOfPaymentsDone());
 
         }
 
@@ -136,7 +137,7 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
 
         double assetTotal = agent.getCash() + assetPlantTotal;
 
-        logger.warn(agent + " has a debt value of " + debtTotal + "and a equity value of" + assetTotal
+        logger.warn(agent + " has a debt value of " + debtTotal + "and an asset value of" + assetTotal
                 + " % at timepoint " + futureTimePoint);
 
         double d1 = (Math.log(assetTotal / debtTotal) + (agent.getLoanInterestFreeRate() + Math.pow(
@@ -381,7 +382,7 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
                 createSpreadOutDownPayments(agent, manufacturer, downPayment, plant);
 
                 double amount = determineLoanAnnuities(investmentCostPayedByDebt, plant.getTechnology()
-                        .getDepreciationTime(), agent.getLoanInterestRate());
+                        .getDepreciationTime(), loanInterestRiskRate);
                 // logger.warn("Loan amount is: " + amount);
                 Loan loan = reps.loanRepository.createLoan(agent, bigbank, amount, plant.getTechnology()
                         .getDepreciationTime(), getCurrentTick(), plant);

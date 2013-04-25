@@ -87,6 +87,17 @@ public class PowerGeneratingTechnology {
     private double technologyNormalisedTechnologyShare;
     private double technologyProbabilityTechnologyShare;
 
+    // credit-risk variable
+    private double initialValueTechnology;
+
+    public double getInitialValueTechnology() {
+        return initialValueTechnology;
+    }
+
+    public void setInitialValueTechnology(double initialValueTechnology) {
+        this.initialValueTechnology = initialValueTechnology;
+    }
+
     public double getTechnologyCapacityShareInvestor() {
         return technologyCapacityShareInvestor;
     }
