@@ -124,6 +124,43 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
             debtTotal = debtTotal + agent.getDebtBias();
         }
 
+        // Calculation of weighted average cost of capital,
+        // based on the companies debt-ratio
+
+        // Equity value according to call option solution of
+        // Black-Scholes here debt-rate of the investor is
+        // determined based upon the financial structure of the
+        // investor. Low asset value with respect to debt means
+        // a
+        // higher debt rate offer
+
+        double assetTotal = agent.getCash() + assetPlantTotal;
+
+        logger.warn(agent + " has a debt value of " + debtTotal + "and a equity value of" + assetTotal
+                + " % at timepoint " + futureTimePoint);
+
+        double d1 = (Math.log(assetTotal / debtTotal) + (agent.getLoanInterestFreeRate() + Math.pow(
+                agent.getAssetValueDeviation(), 2) / 2)
+                * (agent.getTimeToMaturity()))
+                / (agent.getAssetValueDeviation() * Math.sqrt(agent.getTimeToMaturity()));
+
+        double d2 = d1 - agent.getAssetValueDeviation() * Math.sqrt(agent.getTimeToMaturity());
+
+        // Outcome to standard normal variable n1(d1) and
+        // n2(d2) using Taylor approximation
+
+        double n1 = cumulativeNormalDistributionFunction(d1);
+        double n2 = cumulativeNormalDistributionFunction(d2);
+
+        double equityValueBS = (assetTotal * n1)
+                - (debtTotal * Math.exp(-agent.getLoanInterestFreeRate() * agent.getTimeToMaturity())) * n2;
+        double pricedDebtTotal = assetTotal - equityValueBS;
+
+        // Calculation of credit-risk interest rate
+        double loanInterestRiskRate = -1 / agent.getTimeToMaturity() * Math.log(pricedDebtTotal / debtTotal);
+
+        logger.warn(agent + " gets a debt-rate offer of " + loanInterestRiskRate + " % at timepoint " + futureTimePoint);
+
         // Investment decision
         for (ElectricitySpotMarket market : reps.genericRepository.findAllAtRandom(ElectricitySpotMarket.class)) {
 
@@ -267,46 +304,10 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
                         // such as amount of money, market share, portfolio
                         // size.
 
-                        // Calculation of weighted average cost of capital,
-                        // based on the companies debt-ratio
-
-                        // Equity value according to call option solution of
-                        // Black-Scholes here debt-rate of the investor is
-                        // determined based upon the financial structure of the
-                        // investor. Low asset value with respect to debt means
-                        // a
-                        // higher debt rate offer
-
-                        double assetTotal = agent.getCash() + assetPlantTotal;
-
-                        double d1 = (Math.log(assetTotal / debtTotal) + (agent.getLoanInterestFreeRate() + Math.pow(
-                                agent.getAssetValueDeviation(), 2) / 2) * (agent.getTimeToMaturity()))
-                                / (agent.getAssetValueDeviation() * Math.sqrt(agent.getTimeToMaturity()));
-
-                        double d2 = d1 - agent.getAssetValueDeviation() * Math.sqrt(agent.getTimeToMaturity());
-
-                        // TODO outcome to standard normal variable n1(d1) and
-                        // n2(d2) using Taylor approximation
-
-                        double n1 = cumulativeNormalDistributionFunction(d1);
-                        double n2 = cumulativeNormalDistributionFunction(d2);
-
-                        double equityValueBS = (assetTotal * n1)
-                                - (debtTotal * Math.exp(-agent.getLoanInterestFreeRate() * agent.getTimeToMaturity()))
-                                * n2;
-                        double pricedDebtTotal = assetTotal - equityValueBS;
-
-                        // Calculation of credit-risk interest rate
-                        double loanInterestRiskRate = -1 / agent.getTimeToMaturity()
-                                * Math.log(pricedDebtTotal / debtTotal);
-
                         // Determination to accept yes or no? this might not.
 
                         double wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
                                 + agent.getDebtRatioOfInvestments() * loanInterestRiskRate;
-
-                        logger.warn(agent + " gets a debt-rate offer of " + loanInterestRiskRate + " % at timepoint "
-                                + futureTimePoint + " in Market " + market);
 
                         // Creation of out cash-flow during power plant building
                         // phase (note that the cash-flow is negative!)
