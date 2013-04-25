@@ -110,11 +110,31 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
         double assetPlantTotal = 0;
 
         for (PowerPlant plant : reps.powerPlantRepository.findPowerPlantsByOwner(agent)) {
-            debtTotal += (plant.getLoan().getTotalNumberOfPayments() * plant.getLoan().getAmountPerPayment())
-                    - (plant.getLoan().getNumberOfPaymentsDone() * plant.getLoan().getAmountPerPayment());
-            assetPlantTotal += plant.getTechnology().getInitialValueTechnology()
-                    - (plant.getTechnology().getInitialValueTechnology() / plant.getTechnology().getDepreciationTime() * plant
-                            .getLoan().getNumberOfPaymentsDone());
+
+            if (plant.getLoan().getNumberOfPaymentsDone() < plant.getLoan().getTotalNumberOfPayments()) {
+
+                long paymentsLeft = plant.getLoan().getTotalNumberOfPayments()
+                        - plant.getLoan().getNumberOfPaymentsDone();
+                double amountPayment = plant.getLoan().getAmountPerPayment();
+                debtTotal += (paymentsLeft * amountPayment);
+
+            } else {
+
+            }
+
+            if (plant.getLoan().getNumberOfPaymentsDone() < plant.getTechnology().getDepreciationTime()) {
+
+                double plantInvestedCapital = plant.getActualInvestedCapital();
+                double depreciationTermAmount = plantInvestedCapital / plant.getTechnology().getDepreciationTime();
+
+                assetPlantTotal += plantInvestedCapital - depreciationTermAmount;
+
+            } else {
+
+            }
+
+            logger.warn(agent + " debt value is " + debtTotal);
+            logger.warn(agent + " the value of the plants is " + assetPlantTotal);
 
         }
 
@@ -132,20 +152,23 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
         // Black-Scholes here debt-rate of the investor is
         // determined based upon the financial structure of the
         // investor. Low asset value with respect to debt means
-        // a
-        // higher debt rate offer
+        // a higher debt rate offer
 
-        double assetTotal = agent.getCash() + assetPlantTotal;
+        double assetTotal = assetPlantTotal; // agent.getCash() +
 
-        logger.warn(agent + " has a debt value of " + debtTotal + "and an asset value of" + assetTotal
-                + " % at timepoint " + futureTimePoint);
+        // logger.warn(agent + " has a debt value of " + debtTotal +
+        // " and a plant value of " + assetPlantTotal
+        // + " and an (plant + cash) value of " + assetTotal + " at timepoint "
+        // + futureTimePoint);
 
         double d1 = (Math.log(assetTotal / debtTotal) + (agent.getLoanInterestFreeRate() + Math.pow(
                 agent.getAssetValueDeviation(), 2) / 2)
-                * (agent.getTimeToMaturity()))
+                * agent.getTimeToMaturity())
                 / (agent.getAssetValueDeviation() * Math.sqrt(agent.getTimeToMaturity()));
 
-        double d2 = d1 - agent.getAssetValueDeviation() * Math.sqrt(agent.getTimeToMaturity());
+        // logger.warn(agent + " has a d1 of " + d1 + futureTimePoint);
+
+        double d2 = d1 - (agent.getAssetValueDeviation() * Math.sqrt(agent.getTimeToMaturity()));
 
         // Outcome to standard normal variable n1(d1) and
         // n2(d2) using Taylor approximation
@@ -153,8 +176,12 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
         double n1 = cumulativeNormalDistributionFunction(d1);
         double n2 = cumulativeNormalDistributionFunction(d2);
 
+        // logger.warn(agent + " has a n2 of " + n2 + futureTimePoint);
+        // logger.warn(agent + " has a n1 of " + n1 + futureTimePoint);
+
         double equityValueBS = (assetTotal * n1)
                 - (debtTotal * Math.exp(-agent.getLoanInterestFreeRate() * agent.getTimeToMaturity())) * n2;
+
         double pricedDebtTotal = assetTotal - equityValueBS;
 
         // Calculation of credit-risk interest rate
