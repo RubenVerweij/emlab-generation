@@ -154,7 +154,7 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
         // investor. Low asset value with respect to debt means
         // a higher debt rate offer
 
-        double assetTotal = assetPlantTotal; // agent.getCash() +
+        double assetTotal = assetPlantTotal + agent.getCash();
 
         // logger.warn(agent + " has a debt value of " + debtTotal +
         // " and a plant value of " + assetPlantTotal
