@@ -28,6 +28,8 @@ import agentspring.simulation.SimulationParameter;
 @NodeEntity
 public class EnergyProducerTechnologyPreferences extends EnergyProducer implements Agent {
 
+    private boolean investorIncludeSubjectiveFactor;
+
     @SimulationParameter(label = "Weightfactor for subjective criteria", from = 0, to = 5)
     private int weightfactorProfit;
     private int weightfactorEmission;
@@ -41,6 +43,14 @@ public class EnergyProducerTechnologyPreferences extends EnergyProducer implemen
 
     @SimulationParameter(label = "Normalisation parameter for MCDA", from = 1, to = 1.15)
     private double normalisationParameter;
+
+    public boolean isInvestorIncludeSubjectiveFactor() {
+        return investorIncludeSubjectiveFactor;
+    }
+
+    public void setInvestorIncludeSubjectiveFactor(boolean investorIncludeSubjectiveFactor) {
+        this.investorIncludeSubjectiveFactor = investorIncludeSubjectiveFactor;
+    }
 
     public double getNormalisationParameter() {
         return normalisationParameter;
