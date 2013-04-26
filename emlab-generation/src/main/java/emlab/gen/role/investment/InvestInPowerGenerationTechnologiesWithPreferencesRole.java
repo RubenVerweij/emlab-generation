@@ -58,7 +58,7 @@ import emlab.gen.util.MapValueComparator;
  * 
  */
 
-public class InvestInPowerGenerationTechnologiesWithPreferences<T extends EnergyProducerTechnologyPreferences> extends
+public class InvestInPowerGenerationTechnologiesWithPreferencesRole<T extends EnergyProducerTechnologyPreferences> extends
         GenericInvestmentRole<T> implements Role<T>, NodeBacked {
 
     @Transient
@@ -76,6 +76,19 @@ public class InvestInPowerGenerationTechnologiesWithPreferences<T extends Energy
     @Autowired
     @Override
     public void act(T agent) {
+
+        if (agent.getWeightfactorEfficiency() == 0 && agent.getWeightfactorEmission() == 0
+                && agent.getWeightfactorFuelPrice() == 0 && agent.getWeightfactorLifeTime() == 0
+                && agent.getWeightfactorMinimalRunningHours() == 0 && agent.getWeightfactorProfit() == 0
+                && agent.getWeigthfactorInvestmentCost() == 0) {
+
+            agent.setInvestorIncludeSubjectiveFactor(false);
+
+        } else {
+
+            agent.setInvestorIncludeSubjectiveFactor(true);
+
+        }
 
         long futureTimePoint = getCurrentTick() + agent.getInvestmentFutureTimeHorizon();
         // logger.warn(agent + " is looking at timepoint " + futureTimePoint);
