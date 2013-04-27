@@ -30,19 +30,19 @@ public class EnergyProducerTechnologyPreferences extends EnergyProducer implemen
 
     private boolean investorIncludeSubjectiveFactor;
 
-    @SimulationParameter(label = "Weightfactor for subjective criteria", from = 0, to = 5)
+    @SimulationParameter(label = "Weightfactor for profit", from = 0, to = 5)
     private int weightfactorProfit;
-    @SimulationParameter(label = "Weightfactor for subjective criteria", from = 0, to = 5)
+    @SimulationParameter(label = "Weightfactor for emission", from = 0, to = 5)
     private int weightfactorEmission;
-    @SimulationParameter(label = "Weightfactor for subjective criteria", from = 0, to = 5)
+    @SimulationParameter(label = "Weightfactor for efficiency", from = 0, to = 5)
     private int weightfactorEfficiency;
-    @SimulationParameter(label = "Weightfactor for subjective criteria", from = 0, to = 5)
+    @SimulationParameter(label = "Weightfactor for lifetime", from = 0, to = 5)
     private int weightfactorLifeTime;
-    @SimulationParameter(label = "Weightfactor for subjective criteria", from = 0, to = 5)
+    @SimulationParameter(label = "Weightfactor for fuelprice", from = 0, to = 5)
     private int weightfactorFuelPrice;
-    @SimulationParameter(label = "Weightfactor for subjective criteria", from = 0, to = 5)
+    @SimulationParameter(label = "Weightfactor for investmentcost", from = 0, to = 5)
     private int weigthfactorInvestmentCost;
-    @SimulationParameter(label = "Weightfactor for subjective criteria", from = 0, to = 5)
+    @SimulationParameter(label = "Weightfactor for runninghours", from = 0, to = 5)
     private int weightfactorMinimalRunningHours;
 
     // parameter is needed for normalising the propensity values in the MCDA
