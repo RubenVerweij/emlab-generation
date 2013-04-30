@@ -391,7 +391,7 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
                         if (technology.getTechnologyCapacityShareInvestor() < highestShare
                                 && technology.getTechnologyCapacityShareInvestor() > lowestShare) {
 
-                        } else if (technology.getTechnologyPropensity() < lowestShare) {
+                        } else if (technology.getTechnologyCapacityShareInvestor() < lowestShare) {
                             lowestShare = technology.getTechnologyCapacityShareInvestor();
 
                         } else {

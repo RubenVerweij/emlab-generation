@@ -78,6 +78,14 @@ public class PowerPlant {
     private double expectedEndOfLife;
     private double actualNominalCapacity;
 
+    public PowerPlantDispatchPlanRepository getPowerPlantDispatchPlanRepository() {
+        return powerPlantDispatchPlanRepository;
+    }
+
+    public void setPowerPlantDispatchPlanRepository(PowerPlantDispatchPlanRepository powerPlantDispatchPlanRepository) {
+        this.powerPlantDispatchPlanRepository = powerPlantDispatchPlanRepository;
+    }
+
     public boolean isOperational(long currentTick) {
 
         double finishedConstruction = getConstructionStartTime() + calculateActualPermittime()

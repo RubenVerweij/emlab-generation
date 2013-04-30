@@ -22,7 +22,9 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.neo4j.annotation.NodeEntity;
 import org.springframework.data.neo4j.aspects.core.NodeBacked;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,9 +58,11 @@ import emlab.gen.util.MapValueComparator;
  * @author Ruben; algorithm extends the current algorithm with technology
  *         preferences based upon selection of criteria.
  * 
- *         This is the clean one
+ * 
  */
 
+@Configurable
+@NodeEntity
 public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T extends EnergyProducerTechnologyPreferences>
         extends GenericInvestmentRole<T> implements Role<T>, NodeBacked {
 
@@ -74,7 +78,6 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
     @Transient
     Map<ElectricitySpotMarket, MarketInformation> marketInfoMap = new HashMap<ElectricitySpotMarket, MarketInformation>();
 
-    @Autowired
     @Override
     public void act(T agent) {
 
@@ -115,15 +118,14 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
 
         }
 
-        logger.warn(agent + " has subjective factors " + agent.isInvestorIncludeSubjectiveFactor());
+        // logger.warn(agent + " has subjective factors " +
+        // agent.isInvestorIncludeSubjectiveFactor());
 
         // Investment decision
         for (ElectricitySpotMarket market : reps.genericRepository.findAllAtRandom(ElectricitySpotMarket.class)) {
 
             MarketInformation marketInformation = new MarketInformation(market, expectedDemand, expectedFuelPrices,
                     expectedCO2Price.get(market).doubleValue(), futureTimePoint);
-
-            logger.warn(agent + " The investment decision started ");
 
             /*
              * if (marketInfoMap.containsKey(market) &&
@@ -263,6 +265,9 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
                         // technology, runningHours);
                     } else {
 
+                        // logger.warn(technology +
+                        // " the project is considered profitable ");
+
                         double fixedOMCost = calculateFixedOperatingCost(plant);// /
                                                                                 // plant.getActualNominalCapacity();
 
@@ -308,7 +313,8 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
 
                         technology.setProjectValue(discountedOpProfit + discountedCapitalCosts);
 
-                        logger.warn(technology + " has a project value of " + technology.getProjectValue());
+                        // logger.warn(technology + " has a project value of " +
+                        // technology.getProjectValue());
 
                         // logger.warn(
                         // "Agent {}  found the project value for technology {} to be "
@@ -329,9 +335,18 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
                         // propensity
                         //
 
-                        if (technology.getProjectValue() < 0) {
+                        if (technology.getProjectValue() > 0) {
 
-                        } else {
+                            // logger.warn(agent + " is the investor ");
+                            // logger.warn(technology +
+                            // " is the profitable technology is " +
+                            // technology.getName());
+                            // logger.warn(technology +
+                            // " has a NPV value of divided bt nominal capacity "
+                            // + (technology.getProjectValue() /
+                            // plant.getActualNominalCapacity()));
+                            // logger.warn(market +
+                            // " is the market where the investment option is ");
 
                             npvTotal += technology.getProjectValue() / plant.getActualNominalCapacity();
                             efficiencyTotal += plant.getActualEfficiency();
@@ -342,7 +357,22 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
 
                         }
 
+                        // logger.warn(technology + " the efficiency total is "
+                        // + efficiencyTotal);
+                        // logger.warn(technology +
+                        // " The total lifetime value is " + lifetimeTotal);
+                        // logger.warn(technology +
+                        // " the total investment cost is " +
+                        // investmentCostTotal);
+                        // logger.warn(technology +
+                        // " The total value of minimum running hours is " +
+                        // minimalRunningHoursTotal);
+                        // logger.warn(technology + " the footprint total is " +
+                        // footprintTotal);
+
                         if (agent.isInvestorIncludeSubjectiveFactor() == false) {
+
+                            logger.warn(agent + " has no subjective criteria included, which is not correct ");
 
                             /*
                              * Divide by capacity, in order not to favour large
@@ -364,13 +394,6 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
                 }
             }
 
-            logger.warn(agent + " The total NPV value is " + npvTotal);
-            logger.warn(agent + " the efficiency total is " + efficiencyTotal);
-            logger.warn(agent + " The total lifetime value is " + lifetimeTotal);
-            logger.warn(agent + " the total investment cost is " + investmentCostTotal);
-            logger.warn(agent + " The total value of minimum running hours is " + minimalRunningHoursTotal);
-            logger.warn(agent + " the footprint total is " + footprintTotal);
-
             // Now the NPV's are estimated and the propensities are calculated
             // the propensities are normalised and the probabilities are
             // calculated.
@@ -384,17 +407,22 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
 
             if (agent.isInvestorIncludeSubjectiveFactor() == true) {
 
-                double totalPropensity = 0d;
+                // double totalPropensity = 0d;
 
                 for (PowerGeneratingTechnology technology : reps.genericRepository
                         .findAll(PowerGeneratingTechnology.class)) {
 
                     PowerPlant plant = new PowerPlant();
-                    plant.specifyNotPersist(getCurrentTick(), agent, getNodeForZone(market.getZone()), technology);
+                    // plant.specifyNotPersist(getCurrentTick(), agent,
+                    // getNodeForZone(market.getZone()), technology);
 
-                    if (technology.getProjectValue() < 0) {
+                    if (technology.getProjectValue() <= 0) {
 
                     } else {
+
+                        logger.warn(technology + " the total npv value is " + npvTotal);
+                        logger.warn(technology + " the total footprint is " + npvTotal);
+                        logger.warn(technology + " the total efficiency " + npvTotal);
 
                         technology.setTechnologyPropensity(agent.getWeightfactorProfit() * technology.getProjectValue()
                                 / plant.getActualNominalCapacity() / npvTotal - agent.getWeightfactorEmission()
@@ -404,6 +432,8 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
                                 / investmentCostTotal - agent.getWeightfactorMinimalRunningHours()
                                 * technology.getMinimumRunningHours() / minimalRunningHoursTotal
                                 + agent.getWeightfactorLifeTime() * plant.getActualLifetime() / lifetimeTotal);
+
+                        logger.warn(technology + " the propensity is " + technology.getTechnologyPropensity());
 
                         if (technology.getTechnologyPropensity() < highestpropensity
                                 && technology.getTechnologyPropensity() > lowestpropensity) {
@@ -418,12 +448,15 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
 
                     }
 
-                    totalPropensity += technology.getTechnologyPropensity();
+                    // totalPropensity += technology.getTechnologyPropensity();
                 }
 
-                logger.warn(agent + " the total propensity is " + totalPropensity);
-                logger.warn(agent + " the lowest propensity is " + lowestpropensity);
-                logger.warn(agent + " the highest propensity is " + highestpropensity);
+                // logger.warn(agent + " the total propensity is " +
+                // totalPropensity);
+                // logger.warn(agent + " the lowest propensity is " +
+                // lowestpropensity);
+                // logger.warn(agent + " the highest propensity is " +
+                // highestpropensity);
 
                 double totalNormalisedPropensity = 0;
 
@@ -447,8 +480,12 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
                     lowestpropensity = lowestpropensity / agent.getNormalisationParameter();
                 }
 
-                logger.warn(agent + " the lowest propensity after normalization is " + lowestpropensity);
-                logger.warn(agent + " the lowest propensity after normalization is " + highestpropensity);
+                // logger.warn(agent +
+                // " the lowest propensity after normalization is " +
+                // lowestpropensity);
+                // logger.warn(agent +
+                // " the lowest propensity after normalization is " +
+                // highestpropensity);
 
                 int numberProfitableProjects = 0;
 
@@ -457,7 +494,7 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
 
                     // PowerPlant plant = new PowerPlant();
 
-                    if (technology.getProjectValue() < 0) {
+                    if (technology.getProjectValue() <= 0) {
 
                     } else {
 
@@ -472,7 +509,8 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
                     totalNormalisedPropensity += technology.getTechnologyNormalisedPropensity();
                 }
 
-                logger.warn(agent + " the total normalised propensity is " + totalNormalisedPropensity);
+                // logger.warn(agent + " the total normalised propensity is " +
+                // totalNormalisedPropensity);
 
                 // normalise propensities
 
@@ -494,7 +532,7 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
                 for (PowerGeneratingTechnology technology : reps.genericRepository
                         .findAll(PowerGeneratingTechnology.class)) {
 
-                    if (technology.getProjectValue() < 0) {
+                    if (technology.getProjectValue() <= 0) {
 
                     } else {
 
@@ -513,6 +551,10 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
                     // totalProbability +=
                     // technology.getTechnologyProbability();
 
+                    // logger.warn(" Technology" + technology.getName() +
+                    // " has the probabilities of "
+                    // + technology.getTechnologyProbability());
+
                 }
 
                 // --- option one just select the investment with the highest
@@ -530,17 +572,20 @@ public class CopyOfInvestInPowerGenerationTechnologiesWithPreferencesRole<T exte
                 // }
 
                 // --- option two setting probability mass function and select
-                // the
-                // investment option on the basis of a random number.
+                // the investment option on the basis of a random number.
 
-                int k;
+                if (agent.isInvestorIncludeSubjectiveFactor() == false) {
 
-                EmpiricalWalker em = new EmpiricalWalker(technologyProbabilitiesArray, Empirical.NO_INTERPOLATION,
-                        EmpiricalWalker.makeDefaultGenerator());
-                k = em.nextInt();
-                bestTechnology = technologyNamesArray[k];
+                    int k;
+
+                    EmpiricalWalker em = new EmpiricalWalker(technologyProbabilitiesArray, Empirical.NO_INTERPOLATION,
+                            EmpiricalWalker.makeDefaultGenerator());
+                    k = em.nextInt();
+                }
 
             } else {
+
+                bestTechnology = null;
 
             }
 

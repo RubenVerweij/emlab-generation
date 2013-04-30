@@ -76,19 +76,50 @@ public class PowerGeneratingTechnology {
 
     private boolean intermittent;
 
-    // MCDA variables
-    private double projectValue;
-    private double technologyPropensity;
-    private double technologyNormalisedPropensity;
-    private double technologyProbability;
-
     // Portfolio variables
     private double technologyCapacityShareInvestor;
     private double technologyNormalisedTechnologyShare;
     private double technologyProbabilityTechnologyShare;
 
+    private double projectValue;
+    private double technologyPropensity;
+    private double technologyNormalisedPropensity;
+    private double technologyProbability;
+
     // credit-risk variable
     private double initialValueTechnology;
+
+    public double getTechnologyProbability() {
+        return technologyProbability;
+    }
+
+    public void setTechnologyProbability(double technologyProbability) {
+        this.technologyProbability = technologyProbability;
+    }
+
+    public double getTechnologyPropensity() {
+        return technologyPropensity;
+    }
+
+    public void setTechnologyPropensity(double technologyPropensity) {
+        this.technologyPropensity = technologyPropensity;
+    }
+
+    public double getTechnologyNormalisedPropensity() {
+        return technologyNormalisedPropensity;
+    }
+
+    public void setTechnologyNormalisedPropensity(double technologyNormalisedPropensity) {
+        this.technologyNormalisedPropensity = technologyNormalisedPropensity;
+    }
+
+    public double getProjectValue() {
+        return projectValue;
+    }
+
+    public void setProjectValue(double projectValue) {
+        this.projectValue = projectValue;
+    }
 
     public double getInitialValueTechnology() {
         return initialValueTechnology;
@@ -120,38 +151,6 @@ public class PowerGeneratingTechnology {
 
     public void setTechnologyProbabilityTechnologyShare(double technologyProbabilityTechnologyShare) {
         this.technologyProbabilityTechnologyShare = technologyProbabilityTechnologyShare;
-    }
-
-    public double getProjectValue() {
-        return projectValue;
-    }
-
-    public void setProjectValue(double projectValue) {
-        this.projectValue = projectValue;
-    }
-
-    public double getTechnologyPropensity() {
-        return technologyPropensity;
-    }
-
-    public void setTechnologyPropensity(double technologyPropensity) {
-        this.technologyPropensity = technologyPropensity;
-    }
-
-    public double getTechnologyNormalisedPropensity() {
-        return technologyNormalisedPropensity;
-    }
-
-    public void setTechnologyNormalisedPropensity(double technologyNormalisedPropensity) {
-        this.technologyNormalisedPropensity = technologyNormalisedPropensity;
-    }
-
-    public double getTechnologyProbability() {
-        return technologyProbability;
-    }
-
-    public void setTechnologyProbability(double technologyProbability) {
-        this.technologyProbability = technologyProbability;
     }
 
     public double getBaseSegmentDependentAvailability() {
