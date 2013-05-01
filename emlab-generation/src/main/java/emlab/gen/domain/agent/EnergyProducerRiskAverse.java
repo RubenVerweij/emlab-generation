@@ -37,7 +37,7 @@ public class EnergyProducerRiskAverse extends EnergyProducer implements Agent {
     // agent is risk averse / taker for particular technologies
     private boolean specificRiskAverse;
 
-    @SimulationParameter(label = "Risk premium technology", from = -0.05, to = 0.05)
+    @SimulationParameter(label = "Risk premium technology", from = -0.15, to = 0.15)
     private double riskPremiumNuclear;
     private double riskPremiumCoal;
     private double riskPremiumGas;
@@ -53,6 +53,7 @@ public class EnergyProducerRiskAverse extends EnergyProducer implements Agent {
     private boolean followersProfile;
 
     // Border where a investor is considered a giant
+    @SimulationParameter(label = "Market Giant Capacity ", from = 5000, to = 150000)
     private double marketGiantCapacity;
 
     // parameter is needed for normalising the propensity values in the

@@ -738,7 +738,7 @@
 	<!-- Parameter file -->
 	<bean id="projectPropertyConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="classpath:scenarios/parametersA-Old.properties-TestCreditRisk" />
+		<property name="location" value="classpath:scenarios/parametersA-Old.properties" />
 	</bean>
 
 </beans>

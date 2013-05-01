@@ -15,9 +15,7 @@
  ******************************************************************************/
 package emlab.gen.role.investment;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -32,6 +30,8 @@ import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import agentspring.role.Role;
+import cern.jet.random.Empirical;
+import cern.jet.random.EmpiricalWalker;
 import emlab.gen.domain.agent.BigBank;
 import emlab.gen.domain.agent.EnergyProducer;
 import emlab.gen.domain.agent.EnergyProducerRiskAverse;
@@ -62,7 +62,7 @@ import emlab.gen.util.MapValueComparator;
 
 @Configurable
 @NodeEntity
-public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends EnergyProducerRiskAverse> extends
+public class CopyOfInvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends EnergyProducerRiskAverse> extends
         GenericInvestmentRole<T> implements Role<T>, NodeBacked {
 
     @Transient
@@ -106,6 +106,25 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
         // Investment decision
         for (ElectricitySpotMarket market : reps.genericRepository.findAllAtRandom(ElectricitySpotMarket.class)) {
 
+            // Check whether the investor is a diversifying investor
+
+            double totalCapacityInvestor = 0d;
+
+            totalCapacityInvestor = reps.powerPlantRepository.calculateCapacityOfOperationalPowerPlantsByOwner(
+                    futureTimePoint, agent);
+
+            if (totalCapacityInvestor >= agent.getMarketGiantCapacity()) {
+
+                agent.setConservativenessRiskProfile(false);
+
+                agent.setDiversificationProfile(true);
+
+            } else {
+
+                agent.setConservativenessRiskProfile(true);
+                agent.setDiversificationProfile(false);
+            }
+
             MarketInformation marketInformation = new MarketInformation(market, expectedDemand, expectedFuelPrices,
                     expectedCO2Price.get(market).doubleValue(), futureTimePoint);
             /*
@@ -124,12 +143,6 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
             double highestValue = Double.MIN_VALUE;
             PowerGeneratingTechnology bestTechnology = null;
             double projectValue = 0d;
-
-            // Portfolio diversification
-            List<Double> technologyMarketShare = new ArrayList<Double>();
-            List<PowerGeneratingTechnology> technologyNames = new ArrayList<PowerGeneratingTechnology>();
-            List<Double> technologyNormalisedMarketShare = new ArrayList<Double>();
-            List<Double> technologyProbabilityArray = new ArrayList<Double>();
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
@@ -253,37 +266,41 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
                         // Include risk averse behaviour, influences the wacc
                         // value
 
-                        double wacc = 0d;
+                        String substance = technology.getMainFuel().getName();
+                        double wacc = 0;
 
-                        if (technology.getName().equals("Nuclear")) {
+                        if (agent.isSpecificRiskAverse() == true) {
 
-                            wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
-                                    + agent.getRiskPremiumNuclear() + agent.getDebtRatioOfInvestments()
-                                    * agent.getLoanInterestRate();
+                            if (substance == "Uranium") {
 
-                        } else if (technology.getName().equals("CoalPulverized")
-                                || technology.getName().equals("CoalPulverizedCSS")) {
+                                wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
+                                        + agent.getRiskPremiumNuclear() + agent.getDebtRatioOfInvestments()
+                                        * agent.getLoanInterestRate();
+                            } else if (substance == "Coal") {
+                                wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
+                                        + agent.getRiskPremiumCoal() + agent.getDebtRatioOfInvestments()
+                                        * agent.getLoanInterestRate();
 
-                            wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
-                                    + agent.getRiskPremiumCoal() + agent.getDebtRatioOfInvestments()
-                                    * agent.getLoanInterestRate();
+                            } else if (substance == "Gas") {
+                                wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
+                                        + agent.getRiskPremiumGas() + agent.getDebtRatioOfInvestments()
+                                        * agent.getLoanInterestRate();
 
-                        } else if (technology.getName().equals("GasConventional")) {
-                            wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
-                                    + agent.getRiskPremiumGas() + agent.getDebtRatioOfInvestments()
-                                    * agent.getLoanInterestRate();
+                            } else {
+                                wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
+                                        + agent.getRiskPremiumRenewable() + agent.getDebtRatioOfInvestments()
+                                        * agent.getLoanInterestRate();
+                            }
 
                         } else {
-                            wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
-                                    + agent.getRiskPremiumRenewable() + agent.getDebtRatioOfInvestments()
-                                    * agent.getLoanInterestRate();
+
                         }
 
                         // Calculation of weighted average cost of capital,
                         // based on the companies debt-ratio
 
-                        // double wacc = (1 - agent.getDebtRatioOfInvestments())
-                        // * agent.getEquityInterestRate()
+                        // wacc = (1 - agent.getDebtRatioOfInvestments()) *
+                        // agent.getEquityInterestRate()
                         // + agent.getDebtRatioOfInvestments() *
                         // agent.getLoanInterestRate();
 
@@ -335,40 +352,137 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
                          * power plants (which have the single largest NPV
                          */
 
-                        if (projectValue > 0 && projectValue > highestValue) {
-                            highestValue = projectValue;
-                            bestTechnology = plant.getTechnology();
+                        if (agent.isDiversificationProfile() == false) {
 
-                        } else {
+                            if (projectValue > 0 && projectValue > highestValue) {
+                                highestValue = projectValue;
+                                bestTechnology = plant.getTechnology();
 
+                            } else {
+
+                            }
                         }
 
-                        if (projectValue > 0) {
-
-                            technologyNames.add(technology);
-                            technologyMarketShare.add(reps.powerPlantRepository
-                                    .calculateCapacityOfOperationalPowerPlantsByTechnologyByOwner(technology,
-                                            futureTimePoint, agent));
-
-                        }
-
-                        // Deze werkt
-                        // logger.warn(" the technology is "
-                        // + technology
-                        // +
-                        // " the capacity of the powerplants for this technology is "
-                        // +
-                        // reps.powerPlantRepository.calculateCapacityOfOperationalPowerPlantsByTechnology(
-                        // technology, futureTimePoint));
+                        // calculate the technology share for the present
+                        // investor
+                        technology.setTechnologyCapacityShareInvestor((reps.powerPlantRepository
+                                .calculateCapacityOfOperationalPowerPlantsByTechnologyByOwner(technology,
+                                        futureTimePoint, agent))
+                                / (reps.powerPlantRepository.calculateCapacityOfOperationalPowerPlantsByOwner(
+                                        futureTimePoint, agent)));
 
                     }
                 }
 
             }
 
-            // logger.warn(" the array with names is " + technologyNames +
-            // " and the market shares are "
-            // + technologyMarketShare);
+            if (agent.isDiversificationProfile() == true) {
+
+                // Share borders
+                double highestShare = 0d;
+                double lowestShare = 0d;
+
+                for (PowerGeneratingTechnology technology : reps.genericRepository
+                        .findAll(PowerGeneratingTechnology.class)) {
+
+                    PowerPlant plant = new PowerPlant();
+
+                    if (technology.getProjectValue() > 0) {
+
+                        if (technology.getTechnologyCapacityShareInvestor() < highestShare
+                                && technology.getTechnologyCapacityShareInvestor() > lowestShare) {
+
+                        } else if (technology.getTechnologyCapacityShareInvestor() < lowestShare) {
+                            lowestShare = technology.getTechnologyCapacityShareInvestor();
+
+                        } else {
+
+                            highestShare = technology.getTechnologyCapacityShareInvestor();
+                        }
+
+                        if (highestShare < 0) {
+                            highestShare = highestShare / agent.getNormalisationParameter();
+                        } else if (highestShare == 0) {
+                            highestShare = highestShare + 1 * agent.getNormalisationParameter();
+                        } else {
+                            highestShare = highestShare * agent.getNormalisationParameter();
+                        }
+
+                        if (lowestShare < 0) {
+                            highestShare = lowestShare * agent.getNormalisationParameter();
+                        } else if (lowestShare == 0) {
+                            lowestShare = lowestShare - 1 * agent.getNormalisationParameter();
+                        } else {
+                            lowestShare = lowestShare / agent.getNormalisationParameter();
+                        }
+
+                    }
+                }
+
+                double totalTechnologyNormalisedTechnologyShare = 0;
+                int numberProfitableProjects = 0;
+
+                for (PowerGeneratingTechnology technology : reps.genericRepository
+                        .findAll(PowerGeneratingTechnology.class)) {
+
+                    PowerPlant plant = new PowerPlant();
+
+                    if (technology.getProjectValue() < 0) {
+
+                    } else {
+
+                        numberProfitableProjects += 1;
+
+                        technology
+                                .setTechnologyNormalisedTechnologyShare((technology
+                                        .getTechnologyCapacityShareInvestor() - lowestShare)
+                                        * 1
+                                        / (highestShare - lowestShare));
+
+                    }
+
+                    totalTechnologyNormalisedTechnologyShare += technology.getTechnologyNormalisedTechnologyShare();
+                }
+
+                double totalTechnologyProbabilityTechnologyShare = 0;
+
+                PowerGeneratingTechnology[] technologyNamesArray = new PowerGeneratingTechnology[numberProfitableProjects];
+                double[] technologyProbabilitiesArray = new double[numberProfitableProjects];
+                int i = 0;
+
+                for (PowerGeneratingTechnology technology : reps.genericRepository
+                        .findAll(PowerGeneratingTechnology.class)) {
+
+                    if (technology.getProjectValue() < 0) {
+
+                    } else {
+
+                        technology.setTechnologyProbabilityTechnologyShare((1 - technology
+                                .getTechnologyNormalisedTechnologyShare()) / totalTechnologyNormalisedTechnologyShare);
+
+                        // totalPropensity;
+                        // technologyNamesList.add(technology.getName());
+
+                        technologyNamesArray[i] = technology;
+                        technologyProbabilitiesArray[i] = technology.getTechnologyProbabilityTechnologyShare();
+                        i++;
+                    }
+
+                    // verification cumulative probability = 1
+                    totalTechnologyNormalisedTechnologyShare += technology.getTechnologyProbabilityTechnologyShare();
+
+                }
+
+                int k;
+
+                EmpiricalWalker em = new EmpiricalWalker(technologyProbabilitiesArray, Empirical.NO_INTERPOLATION,
+                        EmpiricalWalker.makeDefaultGenerator());
+                k = em.nextInt();
+                bestTechnology = technologyNamesArray[k];
+
+            } else {
+
+            }
 
             if (bestTechnology != null) {
                 // logger.warn("Agent {} invested in technology {} at tick " +
