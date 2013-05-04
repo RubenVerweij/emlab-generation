@@ -375,6 +375,10 @@ public class InvestInPowerGenerationTechnologiesWithPreferencesRole<T extends En
                 }
             }
 
+            logger.warn(" the efficiencies of the profitable projects are " + efficiencyArray);
+            logger.warn(" the lifetimes of the profitable projects are " + lifetimeArray);
+            logger.warn(" the investmentcosts of the profitable projects are " + investmentCostArray);
+
             // propensities
             double highestpropensity = Double.NEGATIVE_INFINITY;
             double lowestpropensity = Double.POSITIVE_INFINITY;
@@ -382,12 +386,45 @@ public class InvestInPowerGenerationTechnologiesWithPreferencesRole<T extends En
             if (technologyNameArray.size() >= 2) {
 
                 for (int i = 0; i < technologyPropensityArray.size(); i++) {
+
                     technologyPropensityArray.set(i, (npvArray.get(i) * agent.getWeightfactorProfit() / npvTotal));
 
                     if (footprintTotal > 0) {
 
                         technologyPropensityArray.set(i, technologyPropensityArray.get(i)
                                 - (footprintArray.get(i) * agent.getWeightfactorEmission() / footprintTotal));
+
+                        if (efficiencyTotal > 0) {
+
+                            technologyPropensityArray.set(i, technologyPropensityArray.get(i)
+                                    + (efficiencyArray.get(i) * agent.getWeightfactorEfficiency() / efficiencyTotal));
+
+                            if (investmentCostTotal > 0) {
+
+                                technologyPropensityArray
+                                        .set(i,
+                                                technologyPropensityArray.get(i)
+                                                        - (investmentCostArray.get(i)
+                                                                * agent.getWeigthfactorInvestmentCost() / investmentCostTotal));
+
+                                if (lifetimeTotal > 0) {
+
+                                    technologyPropensityArray
+                                            .set(i,
+                                                    technologyPropensityArray.get(i)
+                                                            - (lifetimeArray.get(i) * agent.getWeightfactorLifeTime() / lifetimeTotal));
+
+                                } else {
+
+                                }
+
+                            } else {
+
+                            }
+
+                        } else {
+
+                        }
 
                     } else {
 

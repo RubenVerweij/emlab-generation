@@ -229,10 +229,29 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
             List<Double> technologyNormalisedPropensityArray = new ArrayList<Double>();
             List<Double> technologyProbabilityArray = new ArrayList<Double>();
 
+            // Portfolio diversification
+            List<Double> technologyCapacity = new ArrayList<Double>();
+            List<Double> technologyCapacityTotal = new ArrayList<Double>();
+            List<PowerGeneratingTechnology> technologyNames = new ArrayList<PowerGeneratingTechnology>();
+
+            List<Double> technologyMarketShare = new ArrayList<Double>();
+            List<Double> technologyNormalisedMarketShare = new ArrayList<Double>();
+
             // Checks
             String checkInvestorIsNotRiskAverse = null;
             String checkInvestorIsNotTechnologyPreferences = null;
             String checkInvestorIsNotCreditRisk = null;
+
+            double totalCapacity = reps.powerPlantRepository.calculateCapacityOfOperationalPowerPlantsByOwner(agent,
+                    futureTimePoint);
+
+            String riskdiversificationProfile = null;
+
+            if (totalCapacity >= agent.getMarketGiantCapacity()) {
+                riskdiversificationProfile = "true";
+            } else {
+                riskdiversificationProfile = "false";
+            }
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
@@ -498,6 +517,12 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
                             technologyNormalisedPropensityArray.add(0.00);
                             technologyProbabilityArray.add(0.00);
 
+                            technologyNames.add(technology);
+                            technologyCapacity.add(calculateTechnologyMarketShare(agent, technology, futureTimePoint));
+                            technologyCapacityTotal.add(totalCapacity);
+                            technologyMarketShare.add(0.00);
+                            technologyNormalisedMarketShare.add(0.00);
+
                         }
 
                         // double projectTotalValue = projectValuePerMW *
@@ -541,6 +566,41 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
 
                             technologyPropensityArray.set(i, technologyPropensityArray.get(i)
                                     - (footprintArray.get(i) * agent.getWeightfactorEmission() / footprintTotal));
+
+                            if (efficiencyTotal > 0) {
+
+                                technologyPropensityArray
+                                        .set(i,
+                                                technologyPropensityArray.get(i)
+                                                        + (efficiencyArray.get(i) * agent.getWeightfactorEfficiency() / efficiencyTotal));
+
+                                if (investmentCostTotal > 0) {
+
+                                    technologyPropensityArray
+                                            .set(i,
+                                                    technologyPropensityArray.get(i)
+                                                            - (investmentCostArray.get(i)
+                                                                    * agent.getWeigthfactorInvestmentCost() / investmentCostTotal));
+
+                                    if (lifetimeTotal > 0) {
+
+                                        technologyPropensityArray
+                                                .set(i,
+                                                        technologyPropensityArray.get(i)
+                                                                - (lifetimeArray.get(i)
+                                                                        * agent.getWeightfactorLifeTime() / lifetimeTotal));
+
+                                    } else {
+
+                                    }
+
+                                } else {
+
+                                }
+
+                            } else {
+
+                            }
 
                         } else {
 
@@ -630,6 +690,29 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
                 }
 
             } else {
+
+                if (riskdiversificationProfile.equals("true")) {
+
+                    for (int i = 0; i < technologyNames.size(); i++) {
+
+                        technologyMarketShare.set(i, technologyCapacity.get(i) / technologyCapacityTotal.get(i));
+                    }
+
+                    // logger.warn(" Market-share " + technologyMarketShare);
+
+                    double bestValue = Double.POSITIVE_INFINITY;
+
+                    for (int i = 0; i < technologyMarketShare.size(); i++) {
+                        if (technologyMarketShare.get(i) < bestValue) {
+                            bestValue = technologyMarketShare.get(i);
+                            bestTechnology = technologyNames.get(i);
+                        } else {
+
+                        }
+                    }
+                } else {
+
+                }
 
                 checkInvestorIsNotTechnologyPreferences = "true";
 
@@ -797,6 +880,27 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
             fc += amount * fuelPrice;
         }
         return fc;
+    }
+
+    public double calculateTechnologyMarketShare(EnergyProducer producer, PowerGeneratingTechnology technology,
+            long time) {
+
+        String i = technology.getName();
+        double technologyCapacity = 0d;
+
+        for (PowerPlant plant : reps.powerPlantRepository.findOperationalPowerPlantsByOwner(producer, time)) {
+
+            if (plant.getTechnology().getName().equals(i)) {
+
+                technologyCapacity += plant.getActualNominalCapacity();
+
+            } else {
+
+            }
+
+        }
+
+        return technologyCapacity;
     }
 
     private PowerGridNode getNodeForZone(Zone zone) {
