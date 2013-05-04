@@ -229,6 +229,11 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
             List<Double> technologyNormalisedPropensityArray = new ArrayList<Double>();
             List<Double> technologyProbabilityArray = new ArrayList<Double>();
 
+            // Checks
+            String checkInvestorIsNotRiskAverse = null;
+            String checkInvestorIsNotTechnologyPreferences = null;
+            String checkInvestorIsNotCreditRisk = null;
+
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
                 PowerPlant plant = new PowerPlant();
@@ -383,6 +388,8 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
 
                             } else {
 
+                                checkInvestorIsNotRiskAverse = "true";
+
                                 wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
                                         + agent.getDebtRatioOfInvestments() * loanInterestRiskRate;
                             }
@@ -393,6 +400,8 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
                             // futureTimePoint);
 
                         } else {
+
+                            checkInvestorIsNotCreditRisk = "true";
 
                             if (agent.getSpecificRiskAverse().equals("true")) {
 
@@ -421,6 +430,8 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
                                 }
 
                             } else {
+
+                                checkInvestorIsNotRiskAverse = "true";
 
                                 wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
                                         + agent.getDebtRatioOfInvestments() * agent.getLoanInterestRate();
@@ -501,6 +512,8 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
                          */
 
                         if (agent.getInvestorIncludeSubjectiveFactor().equals("false")) {
+
+                            checkInvestorIsNotTechnologyPreferences = "true";
 
                             if (projectValue > 0 && projectValue / plant.getActualNominalCapacity() > highestValue) {
                                 highestValue = projectValue / plant.getActualNominalCapacity();
@@ -618,6 +631,8 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
 
             } else {
 
+                checkInvestorIsNotTechnologyPreferences = "true";
+
             }
 
             if (bestTechnology != null) {
@@ -626,9 +641,11 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
                         + " and technology preferences " + agent.getInvestorIncludeSubjectiveFactor()
                         + " and includes risk-averse behaviour " + agent.getSpecificRiskAverse()
                         + " the probabilities in investing are " + technologyProbabilityArray
-                        + " for the following technologies " + technologyNameArray + " the best technology is "
-                        + bestTechnology + " the loan is granted for a interest rate of " + loanInterestRiskRate
-                        + " % ");
+                        + " for the following technologies " + technologyNameArray + " the NPV's are " + npvArray
+                        + " the best technology is " + bestTechnology + " the loan is granted for a interest rate of "
+                        + loanInterestRiskRate + " % " + " checks risk-averse " + checkInvestorIsNotRiskAverse
+                        + " checks technology preferences " + checkInvestorIsNotTechnologyPreferences
+                        + " checks risk-averse " + checkInvestorIsNotCreditRisk);
             }
 
             if (bestTechnology != null) {

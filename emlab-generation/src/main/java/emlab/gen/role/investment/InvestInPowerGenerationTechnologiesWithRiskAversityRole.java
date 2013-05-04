@@ -126,10 +126,24 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
             double projectValue = 0d;
 
             // Portfolio diversification
-            List<Double> technologyMarketShare = new ArrayList<Double>();
+            List<Double> technologyCapacity = new ArrayList<Double>();
+            List<Double> technologyCapacityTotal = new ArrayList<Double>();
             List<PowerGeneratingTechnology> technologyNames = new ArrayList<PowerGeneratingTechnology>();
+
+            List<Double> technologyMarketShare = new ArrayList<Double>();
             List<Double> technologyNormalisedMarketShare = new ArrayList<Double>();
             List<Double> technologyProbabilityArray = new ArrayList<Double>();
+
+            double totalCapacity = reps.powerPlantRepository.calculateCapacityOfOperationalPowerPlantsByOwner(agent,
+                    futureTimePoint);
+
+            String riskdiversificationProfile = null;
+
+            if (totalCapacity >= agent.getMarketGiantCapacity()) {
+                riskdiversificationProfile = "true";
+            } else {
+                riskdiversificationProfile = "false";
+            }
 
             for (PowerGeneratingTechnology technology : reps.genericRepository.findAll(PowerGeneratingTechnology.class)) {
 
@@ -335,44 +349,83 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
                          * power plants (which have the single largest NPV
                          */
 
-                        if (projectValue > 0 && projectValue > highestValue) {
-                            highestValue = projectValue;
-                            bestTechnology = plant.getTechnology();
+                        if (riskdiversificationProfile.equals("false")) {
+
+                            if (projectValue > 0 && projectValue > highestValue) {
+                                highestValue = projectValue;
+                                bestTechnology = plant.getTechnology();
+
+                            } else {
+
+                            }
 
                         } else {
 
+                            if (projectValue > 0) {
+
+                                technologyNames.add(technology);
+                                technologyCapacity.add(calculateTechnologyMarketShare(agent, technology,
+                                        futureTimePoint));
+                                technologyCapacityTotal.add(totalCapacity);
+                                technologyMarketShare.add(0.00);
+                                technologyNormalisedMarketShare.add(0.00);
+                                technologyProbabilityArray.add(0.00);
+
+                            } else {
+
+                            }
+
                         }
-
-                        if (projectValue > 0) {
-
-                            technologyNames.add(technology);
-                            technologyMarketShare.add(reps.powerPlantRepository
-                                    .calculateCapacityOfOperationalPowerPlantsByTechnologyByOwner(technology,
-                                            futureTimePoint, agent));
-
-                        }
-
-                        // Deze werkt
-                        // logger.warn(" the technology is "
-                        // + technology
-                        // +
-                        // " the capacity of the powerplants for this technology is "
-                        // +
-                        // reps.powerPlantRepository.calculateCapacityOfOperationalPowerPlantsByTechnology(
-                        // technology, futureTimePoint));
 
                     }
                 }
 
             }
 
-            // logger.warn(" the array with names is " + technologyNames +
-            // " and the market shares are "
-            // + technologyMarketShare);
+            // logger.warn(" Total capacity " + technologyCapacityTotal);
+
+            if (riskdiversificationProfile.equals("true")) {
+
+                for (int i = 0; i < technologyNames.size(); i++) {
+
+                    technologyMarketShare.set(i, technologyCapacity.get(i) / technologyCapacityTotal.get(i));
+                }
+
+                // logger.warn(" Market-share " + technologyMarketShare);
+
+                double bestValue = Double.POSITIVE_INFINITY;
+
+                for (int i = 0; i < technologyMarketShare.size(); i++) {
+                    if (technologyMarketShare.get(i) < bestValue) {
+                        bestValue = technologyMarketShare.get(i);
+                        bestTechnology = technologyNames.get(i);
+                    } else {
+
+                    }
+                }
+            } else {
+
+            }
+
+            logger.warn(" Agent " + agent + " has chosen the best technology " + bestTechnology
+                    + " from the following options " + technologyNames + " he diversifies his portfolio "
+                    + riskdiversificationProfile + " and the market-shares of the potential technologies are "
+                    + technologyMarketShare + " his total capacity is " + technologyCapacityTotal);
+
+            // logger.warn(" investor " + agent +
+            // " has the following technology capacities " +
+            // technologyMarketShare
+            // + " for these technology" + technologyNames +
+            // " the agent has a total capacity of " + totalCapacity);
+
+            // logger.warn(" Normalised market-share " +
+            // technologyNormalisedMarketShare);
+            // logger.warn(" Probability " + technologyProbabilityArray);
+            // logger.warn(" Lowest-share " + lowestshare);
+            // logger.warn(" Highest-share " + highestshare);
+            // logger.warn(" THe best technology is " + bestTechnology);
 
             if (bestTechnology != null) {
-                // logger.warn("Agent {} invested in technology {} at tick " +
-                // getCurrentTick(), agent, bestTechnology);
 
                 PowerPlant plant = new PowerPlant();
                 plant.specifyAndPersist(getCurrentTick(), agent, getNodeForZone(market.getZone()), bestTechnology);
@@ -496,6 +549,27 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
             fc += amount * fuelPrice;
         }
         return fc;
+    }
+
+    public double calculateTechnologyMarketShare(EnergyProducer producer, PowerGeneratingTechnology technology,
+            long time) {
+
+        String i = technology.getName();
+        double technologyCapacity = 0d;
+
+        for (PowerPlant plant : reps.powerPlantRepository.findOperationalPowerPlantsByOwner(producer, time)) {
+
+            if (plant.getTechnology().getName().equals(i)) {
+
+                technologyCapacity += plant.getActualNominalCapacity();
+
+            } else {
+
+            }
+
+        }
+
+        return technologyCapacity;
     }
 
     private PowerGridNode getNodeForZone(Zone zone) {

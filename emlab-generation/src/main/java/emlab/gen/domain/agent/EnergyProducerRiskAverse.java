@@ -30,10 +30,6 @@ import agentspring.simulation.SimulationParameter;
 @NodeEntity
 public class EnergyProducerRiskAverse extends EnergyProducer implements Agent {
 
-    // @RelatedTo(type = "PRODUCER_PRODUCERCREDITRISK", elementClass =
-    // EnergyProducerCreditRisk.class, direction = Direction.OUTGOING)
-    // EnergyProducerCreditRisk energyProducerCreditRisk;
-
     // agent is risk averse / taker for particular technologies
     private boolean specificRiskAverse;
 
@@ -42,9 +38,6 @@ public class EnergyProducerRiskAverse extends EnergyProducer implements Agent {
     private double riskPremiumCoal;
     private double riskPremiumGas;
     private double riskPremiumRenewable;
-
-    // agent tend to invest in
-    private boolean diversificationProfile;
 
     // agent tends to invest in conventional technologies
     private boolean conservativenessRiskProfile;
@@ -76,14 +69,6 @@ public class EnergyProducerRiskAverse extends EnergyProducer implements Agent {
 
     public void setMarketGiantCapacity(double marketGiantCapacity) {
         this.marketGiantCapacity = marketGiantCapacity;
-    }
-
-    public boolean isDiversificationProfile() {
-        return diversificationProfile;
-    }
-
-    public void setDiversificationProfile(boolean diversificationProfile) {
-        this.diversificationProfile = diversificationProfile;
     }
 
     public boolean isSpecificRiskAverse() {
