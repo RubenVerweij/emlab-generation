@@ -407,10 +407,14 @@ public class InvestInPowerGenerationTechnologiesWithRiskAversityRole<T extends E
 
             }
 
-            logger.warn(" Agent " + agent + " has chosen the best technology " + bestTechnology
-                    + " from the following options " + technologyNames + " he diversifies his portfolio "
-                    + riskdiversificationProfile + " and the market-shares of the potential technologies are "
-                    + technologyMarketShare + " his total capacity is " + technologyCapacityTotal);
+            // logger.warn(" Agent " + agent +
+            // " has chosen the best technology " + bestTechnology
+            // + " from the following options " + technologyNames +
+            // " he diversifies his portfolio "
+            // + riskdiversificationProfile +
+            // " and the market-shares of the potential technologies are "
+            // + technologyMarketShare + " his total capacity is " +
+            // technologyCapacityTotal);
 
             // logger.warn(" investor " + agent +
             // " has the following technology capacities " +

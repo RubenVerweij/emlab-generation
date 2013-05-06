@@ -375,10 +375,6 @@ public class InvestInPowerGenerationTechnologiesWithPreferencesRole<T extends En
                 }
             }
 
-            logger.warn(" the efficiencies of the profitable projects are " + efficiencyArray);
-            logger.warn(" the lifetimes of the profitable projects are " + lifetimeArray);
-            logger.warn(" the investmentcosts of the profitable projects are " + investmentCostArray);
-
             // propensities
             double highestpropensity = Double.NEGATIVE_INFINITY;
             double lowestpropensity = Double.POSITIVE_INFINITY;
@@ -469,11 +465,6 @@ public class InvestInPowerGenerationTechnologiesWithPreferencesRole<T extends En
             // logger.warn(" the NPV´s are " + npvArray);
             // logger.warn(" the footprints are " + footprintArray);
 
-            // logger.warn(" the propensities are " +
-            // technologyPropensityArray);
-            // logger.warn(" the highest propensity is " + highestpropensity);
-            // logger.warn(" the lowest propensity is " + lowestpropensity);
-
             if (highestpropensity < 0) {
                 highestpropensity = highestpropensity / agent.getNormalisationParameter();
             } else if (highestpropensity == 0) {
@@ -546,7 +537,15 @@ public class InvestInPowerGenerationTechnologiesWithPreferencesRole<T extends En
             // logger.warn(" the highest propensity is " + highestpropensity);
             // logger.warn(" the lowest propensity is " + lowestpropensity);
 
-            logger.warn(" probabilities in investing are " + technologyProbabilityArray
+            logger.warn(" DATA - the efficiencies of the profitable projects are " + efficiencyArray);
+            logger.warn(" DATA - the lifetimes of the profitable projects are " + lifetimeArray);
+            logger.warn(" DATA - the investmentcosts of the profitable projects are " + investmentCostArray);
+            logger.warn(" DATA - the NPV's of the profitable projects are " + npvArray);
+            logger.warn(" DATA - the propensities are " + technologyPropensityArray);
+            logger.warn(" DATA - the highest propensity is " + highestpropensity);
+            logger.warn(" DATA - the lowest propensity is " + lowestpropensity);
+            logger.warn(agent + " includes subjective factors " + agent.isInvestorIncludeSubjectiveFactor()
+                    + " and has the following probabilities " + technologyProbabilityArray
                     + " for the following technologies " + technologyNameArray + " the best technology is "
                     + bestTechnology);
 

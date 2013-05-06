@@ -130,6 +130,14 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
 
             }
 
+            if (debtTotal == 0) {
+
+                debtTotal = 1;
+
+            } else {
+
+            }
+
             // logger.warn(agent + " debt value is " + debtTotal);
             // logger.warn(agent + " the value of the plants is " +
             // assetPlantTotal);

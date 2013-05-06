@@ -133,8 +133,17 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
 
             }
 
-            logger.warn(agent + " debt value is " + debtTotal);
-            logger.warn(agent + " the value of the plants is " + assetPlantTotal);
+            if (debtTotal == 0) {
+
+                debtTotal = 1;
+
+            } else {
+
+            }
+
+            // logger.warn(agent + " debt value is " + debtTotal);
+            // logger.warn(agent + " the value of the plants is " +
+            // assetPlantTotal);
 
         }
 
@@ -156,17 +165,15 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
 
         double assetTotal = assetPlantTotal + agent.getCash();
 
-        // logger.warn(agent + " has a debt value of " + debtTotal +
-        // " and a plant value of " + assetPlantTotal
-        // + " and an (plant + cash) value of " + assetTotal + " at timepoint "
-        // + futureTimePoint);
+        logger.warn(agent + " has a debt value of " + debtTotal + " and a plant value of " + assetPlantTotal
+                + " and an (plant + cash) value of " + assetTotal + " at timepoint " + futureTimePoint);
 
         double d1 = (Math.log(assetTotal / debtTotal) + (agent.getLoanInterestFreeRate() + Math.pow(
                 agent.getAssetValueDeviation(), 2) / 2)
                 * agent.getTimeToMaturity())
                 / (agent.getAssetValueDeviation() * Math.sqrt(agent.getTimeToMaturity()));
 
-        // logger.warn(agent + " has a d1 of " + d1 + futureTimePoint);
+        logger.warn(agent + " has a d1 of " + d1 + futureTimePoint);
 
         double d2 = d1 - (agent.getAssetValueDeviation() * Math.sqrt(agent.getTimeToMaturity()));
 
@@ -176,18 +183,21 @@ public class InvestInPowerGenerationTechnologiesWithCreditRiskRole<T extends Ene
         double n1 = cumulativeNormalDistributionFunction(d1);
         double n2 = cumulativeNormalDistributionFunction(d2);
 
-        // logger.warn(agent + " has a n2 of " + n2 + futureTimePoint);
-        // logger.warn(agent + " has a n1 of " + n1 + futureTimePoint);
+        logger.warn(agent + " has a n2 of " + n2 + futureTimePoint);
+        logger.warn(agent + " has a n1 of " + n1 + futureTimePoint);
 
         double equityValueBS = (assetTotal * n1)
                 - (debtTotal * Math.exp(-agent.getLoanInterestFreeRate() * agent.getTimeToMaturity())) * n2;
+
+        logger.warn(agent + " has an equity value " + equityValueBS);
 
         double pricedDebtTotal = assetTotal - equityValueBS;
 
         // Calculation of credit-risk interest rate
         double loanInterestRiskRate = -1 / agent.getTimeToMaturity() * Math.log(pricedDebtTotal / debtTotal);
 
-        logger.warn(agent + " gets a debt-rate offer of " + loanInterestRiskRate + " % at timepoint " + futureTimePoint);
+        logger.warn(agent + " gets a debt-rate offer of " + loanInterestRiskRate + " % at timepoint " + futureTimePoint
+                + " the priced equity is " + equityValueBS);
 
         // Investment decision
         for (ElectricitySpotMarket market : reps.genericRepository.findAllAtRandom(ElectricitySpotMarket.class)) {
