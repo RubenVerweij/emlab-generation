@@ -250,8 +250,15 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
             String checkInvestorIsNotTechnologyPreferences = null;
             String checkInvestorIsNotCreditRisk = null;
 
-            double totalCapacity = reps.powerPlantRepository.calculateCapacityOfOperationalPowerPlantsByOwner(agent,
-                    futureTimePoint);
+            double totalCapacity = 0d;
+
+            totalCapacity = reps.powerPlantRepository.calculateCapacityOfOperationalPowerPlantsByOwner(agent,
+                    getCurrentTick());
+
+            // ensure that 0 is returned
+            // if (totalCapacity <= 0) {
+            // totalCapacity = 0d;
+            // }
 
             String riskdiversificationProfile = null;
 
@@ -526,7 +533,7 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
                             technologyProbabilityArray.add(0.00);
 
                             technologyNames.add(technology);
-                            technologyCapacity.add(calculateTechnologyMarketShare(agent, technology, futureTimePoint));
+                            technologyCapacity.add(calculateTechnologyMarketShare(agent, technology, getCurrentTick()));
                             technologyCapacityTotal.add(totalCapacity);
                             technologyMarketShare.add(0.00);
                             technologyNormalisedMarketShare.add(0.00);
@@ -544,7 +551,8 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
                          * power plants (which have the single largest NPV
                          */
 
-                        if (agent.getInvestorIncludeSubjectiveFactor().equals("false")) {
+                        if (agent.getInvestorIncludeSubjectiveFactor().equals("false")
+                                && riskdiversificationProfile == "false") {
 
                             checkInvestorIsNotTechnologyPreferences = "true";
 
@@ -731,10 +739,13 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
                 logger.warn(agent + " includes credit-risk " + agent.getInvestorIncludeCreditRisk()
                         + " and technology preferences " + agent.getInvestorIncludeSubjectiveFactor()
                         + " and includes risk-averse behaviour " + agent.getSpecificRiskAverse()
+                        + " the agent is diversifying his portfolio? " + riskdiversificationProfile
                         + " the probabilities in investing are " + technologyProbabilityArray
                         + " for the following technologies " + technologyNameArray + " the NPV's are " + npvArray
-                        + " the best technology is " + bestTechnology + " the loan is granted for a interest rate of "
-                        + loanInterestRiskRate + " % " + " checks risk-averse " + checkInvestorIsNotRiskAverse
+                        + " the individual capacities for these technologies are " + technologyCapacity
+                        + " the total capacity is " + technologyCapacityTotal + " the best technology is "
+                        + bestTechnology + " the loan is granted for a interest rate of " + loanInterestRiskRate
+                        + " % " + " checks risk-averse " + checkInvestorIsNotRiskAverse
                         + " checks technology preferences " + checkInvestorIsNotTechnologyPreferences
                         + " checks risk-averse " + checkInvestorIsNotCreditRisk);
             }

@@ -254,7 +254,8 @@ public interface PowerPlantRepository extends GraphRepository<PowerPlant> {
 
     // calculation of capacity/owner works
 
-    @Query(value = "g.v(owner).in('POWERPLANT_OWNER').filter{(it.dismantleTime > tick) && ((it.constructionStartTime + it.actualPermittime + it.actualLeadtime) <= tick)}.sum{it.actualNominalCapacity};", type = QueryType.Gremlin)
+    @Query(value = "result = g.v(owner).in('POWERPLANT_OWNER').filter{(it.dismantleTime > tick) && ((it.constructionStartTime + it.actualPermittime + it.actualLeadtime) <= tick)}.sum{it.actualNominalCapacity};"
+            + "if(result == null){return 0} else{return result}", type = QueryType.Gremlin)
     double calculateCapacityOfOperationalPowerPlantsByOwner(@Param("owner") EnergyProducer owner,
             @Param("tick") long tick);
 
