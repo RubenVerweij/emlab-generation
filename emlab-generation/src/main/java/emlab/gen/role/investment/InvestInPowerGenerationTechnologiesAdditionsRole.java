@@ -734,21 +734,31 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
 
             }
 
-            if (bestTechnology != null) {
+            // if (bestTechnology != null) {
 
-                logger.warn(agent + " includes credit-risk " + agent.getInvestorIncludeCreditRisk()
-                        + " and technology preferences " + agent.getInvestorIncludeSubjectiveFactor()
-                        + " and includes risk-averse behaviour " + agent.getSpecificRiskAverse()
-                        + " the agent is diversifying his portfolio? " + riskdiversificationProfile
-                        + " the probabilities in investing are " + technologyProbabilityArray
-                        + " for the following technologies " + technologyNameArray + " the NPV's are " + npvArray
-                        + " the individual capacities for these technologies are " + technologyCapacity
-                        + " the total capacity is " + technologyCapacityTotal + " the best technology is "
-                        + bestTechnology + " the loan is granted for a interest rate of " + loanInterestRiskRate
-                        + " % " + " checks risk-averse " + checkInvestorIsNotRiskAverse
-                        + " checks technology preferences " + checkInvestorIsNotTechnologyPreferences
-                        + " checks risk-averse " + checkInvestorIsNotCreditRisk);
-            }
+            // logger.warn(agent + " includes credit-risk " +
+            // agent.getInvestorIncludeCreditRisk()
+            // + " and technology preferences " +
+            // agent.getInvestorIncludeSubjectiveFactor()
+            // + " and includes risk-averse behaviour " +
+            // agent.getSpecificRiskAverse()
+            // + " the agent is diversifying his portfolio? " +
+            // riskdiversificationProfile
+            // + " the probabilities in investing are " +
+            // technologyProbabilityArray
+            // + " for the following technologies " + technologyNameArray +
+            // " the NPV's are " + npvArray
+            // + " the individual capacities for these technologies are " +
+            // technologyCapacity
+            // + " the total capacity is " + technologyCapacityTotal +
+            // " the best technology is "
+            // + bestTechnology + " the loan is granted for a interest rate of "
+            // + loanInterestRiskRate
+            // + " % " + " checks risk-averse " + checkInvestorIsNotRiskAverse
+            // + " checks technology preferences " +
+            // checkInvestorIsNotTechnologyPreferences
+            // + " checks risk-averse " + checkInvestorIsNotCreditRisk);
+            // }
 
             if (bestTechnology != null) {
                 // logger.warn("Agent {} invested in technology {} at tick " +
