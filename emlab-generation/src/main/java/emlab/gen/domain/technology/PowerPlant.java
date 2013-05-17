@@ -83,8 +83,8 @@ public class PowerPlant {
 
     public boolean isOperational(long currentTick) {
 
-        double finishedConstruction = getConstructionStartTime()
-                + calculateActualPermittime() + calculateActualLeadtime();
+        double finishedConstruction = getConstructionStartTime() + calculateActualPermittime()
+                + calculateActualLeadtime();
 
         if (finishedConstruction <= currentTick) {
             // finished construction
@@ -106,8 +106,8 @@ public class PowerPlant {
 
     public boolean isExpectedToBeOperational(long time) {
 
-        double finishedConstruction = getConstructionStartTime()
-                + calculateActualPermittime() + calculateActualLeadtime();
+        double finishedConstruction = getConstructionStartTime() + calculateActualPermittime()
+                + calculateActualLeadtime();
 
         if (finishedConstruction <= time) {
             // finished construction
@@ -123,8 +123,8 @@ public class PowerPlant {
 
     public boolean isInPipeline(long currentTick) {
 
-        double finishedConstruction = getConstructionStartTime()
-                + calculateActualPermittime() + calculateActualLeadtime();
+        double finishedConstruction = getConstructionStartTime() + calculateActualPermittime()
+                + calculateActualLeadtime();
 
         if (finishedConstruction > currentTick) {
             // finished construction
@@ -144,8 +144,7 @@ public class PowerPlant {
         return false;
     }
 
-    public double getAvailableCapacity(long currentTick, Segment segment,
-            long numberOfSegments) {
+    public double getAvailableCapacity(long currentTick, Segment segment, long numberOfSegments) {
         if (isOperational(currentTick)) {
             double factor = 1;
             if (segment != null) {// if no segment supplied, assume we want full
@@ -153,12 +152,9 @@ public class PowerPlant {
                 double segmentID = segment.getSegmentID();
                 if ((int) segmentID != 1) {
 
-                    double min = getTechnology()
-                            .getPeakSegmentDependentAvailability();
-                    double max = getTechnology()
-                            .getBaseSegmentDependentAvailability();
-                    double segmentPortion = (numberOfSegments - segmentID)
-                            / (numberOfSegments - 1); // start
+                    double min = getTechnology().getPeakSegmentDependentAvailability();
+                    double max = getTechnology().getBaseSegmentDependentAvailability();
+                    double segmentPortion = (numberOfSegments - segmentID) / (numberOfSegments - 1); // start
                     // counting
                     // at
                     // 1.
@@ -168,8 +164,7 @@ public class PowerPlant {
                     factor = max - segmentPortion * range;
                     int i = 0;
                 } else {
-                    factor = getTechnology()
-                            .getPeakSegmentDependentAvailability();
+                    factor = getTechnology().getPeakSegmentDependentAvailability();
                 }
             }
             return getActualNominalCapacity() * factor;
@@ -178,19 +173,15 @@ public class PowerPlant {
         }
     }
 
-    public double getExpectedAvailableCapacity(long futureTick,
-            Segment segment, long numberOfSegments) {
+    public double getExpectedAvailableCapacity(long futureTick, Segment segment, long numberOfSegments) {
         if (isExpectedToBeOperational(futureTick)) {
             double factor = 1;
             if (segment != null) {// if no segment supplied, assume we want full
                 // capacity
                 double segmentID = segment.getSegmentID();
-                double min = getTechnology()
-                        .getPeakSegmentDependentAvailability();
-                double max = getTechnology()
-                        .getBaseSegmentDependentAvailability();
-                double segmentPortion = (numberOfSegments - segmentID)
-                        / (numberOfSegments - 1); // start
+                double min = getTechnology().getPeakSegmentDependentAvailability();
+                double max = getTechnology().getBaseSegmentDependentAvailability();
+                double segmentPortion = (numberOfSegments - segmentID) / (numberOfSegments - 1); // start
                 // counting
                 // at
                 // 1.
@@ -249,9 +240,8 @@ public class PowerPlant {
      * @return whether the plant is still in its technical lifetime.
      */
     public boolean isWithinTechnicalLifetime(long currentTick) {
-        long endOfTechnicalLifetime = getConstructionStartTime()
-                + calculateActualPermittime() + calculateActualLeadtime()
-                + calculateActualLifetime();
+        long endOfTechnicalLifetime = getConstructionStartTime() + calculateActualPermittime()
+                + calculateActualLeadtime() + calculateActualLifetime();
         if (endOfTechnicalLifetime <= currentTick) {
             return false;
         }
@@ -396,24 +386,23 @@ public class PowerPlant {
                 * getActualNominalCapacity());
     }
 
-    @Override
-    public String toString() {
-        return this.getName() + " power plant";
-    }
-
-    /**
-     * Sets the actual capital that is needed to build the power plant. It reads
-     * the investment cost from the and automatically adjusts for the actual
-     * building and permit time, as well as power plant size.
+    /*
+     * @Override public String toString() { return this.getName() +
+     * " power plant"; }/*
+     * 
+     * /** Sets the actual capital that is needed to build the power plant. It
+     * reads the investment cost from the and automatically adjusts for the
+     * actual building and permit time, as well as power plant size.
      * 
      * @param timeOfPermitorBuildingStart
      */
-    public void calculateAndSetActualInvestedCapital(
-            long timeOfPermitorBuildingStart) {
-        setActualInvestedCapital(this.getTechnology().getInvestmentCost(
-                timeOfPermitorBuildingStart + getActualLeadtime() + getActualPermittime())
-                * getActualNominalCapacity());
-    }
+    /*
+     * public void calculateAndSetActualInvestedCapital( long
+     * timeOfPermitorBuildingStart) {
+     * setActualInvestedCapital(this.getTechnology().getInvestmentCost(
+     * timeOfPermitorBuildingStart + getActualLeadtime() +
+     * getActualPermittime()) getActualNominalCapacity()); }
+     */
 
     public void calculateAndSetActualFixedOperatingCosts(long timeOfPermitorBuildingStart) {
         setActualFixedOperatingCost(this.getTechnology().getFixedOperatingCost(
@@ -432,8 +421,7 @@ public class PowerPlant {
         for (SubstanceShareInFuelMix sub : this.getFuelMix()) {
             Substance substance = sub.getSubstance();
             double fuelAmount = sub.getShare();
-            double co2density = substance.getCo2Density()
-                    * (1 - this.getTechnology().getCo2CaptureEffciency());
+            double co2density = substance.getCo2Density() * (1 - this.getTechnology().getCo2CaptureEffciency());
 
             // determine the total cost per MWh production of this plant
             double emissionForThisFuel = fuelAmount * co2density;
@@ -449,15 +437,13 @@ public class PowerPlant {
         for (PowerPlantDispatchPlan plan : powerPlantDispatchPlanRepository
                 .findAllPowerPlantDispatchPlansForPowerPlantForTime(this, time)) {
             amount += plan.getSegment().getLengthInHours()
-                    * (plan.getCapacityLongTermContract() + plan
-                            .getAcceptedAmount());
+                    * (plan.getCapacityLongTermContract() + plan.getAcceptedAmount());
         }
         return amount;
     }
 
     public double calculateCO2EmissionsAtTime(long time) {
-        return this.calculateEmissionIntensity()
-                * calculateElectricityOutputAtTime(time);
+        return this.calculateEmissionIntensity() * calculateElectricityOutputAtTime(time);
     }
 
     @Transactional
@@ -480,14 +466,14 @@ public class PowerPlant {
      * @author J.C.Richstein
      */
     @Transactional
-    public void specifyAndPersist(long time, EnergyProducer energyProducer,
-            PowerGridNode location, PowerGeneratingTechnology technology) {
-        specifyNotPersist(time, energyProducer, location, technology);
-        this.persist();
-    }
-
-    public void specifyNotPersist(long time, EnergyProducer energyProducer,
-            PowerGridNode location, PowerGeneratingTechnology technology) {
+    /*
+     * public void specifyAndPersist(long time, EnergyProducer energyProducer,
+     * PowerGridNode location, PowerGeneratingTechnology technology) {
+     * specifyNotPersist(time, energyProducer, location, technology);
+     * this.persist(); }
+     */
+    public void specifyNotPersist(long time, EnergyProducer energyProducer, PowerGridNode location,
+            PowerGeneratingTechnology technology) {
         String label = energyProducer.getName() + " - " + technology.getName();
         this.setName(label);
         this.setTechnology(technology);
@@ -502,8 +488,8 @@ public class PowerPlant {
         this.setDismantleTime(1000);
         this.calculateAndSetActualInvestedCapital(time);
         this.calculateAndSetActualFixedOperatingCosts(time);
-        this.setExpectedEndOfLife(time + getActualPermittime()
-                + getActualLeadtime() + getTechnology().getExpectedLifetime());
+        this.setExpectedEndOfLife(time + getActualPermittime() + getActualLeadtime()
+                + getTechnology().getExpectedLifetime());
     }
 
     @Transactional
