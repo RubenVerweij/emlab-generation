@@ -466,12 +466,12 @@ public class PowerPlant {
      * @author J.C.Richstein
      */
     @Transactional
-    /*
-     * public void specifyAndPersist(long time, EnergyProducer energyProducer,
-     * PowerGridNode location, PowerGeneratingTechnology technology) {
-     * specifyNotPersist(time, energyProducer, location, technology);
-     * this.persist(); }
-     */
+    public void specifyAndPersist(long time, EnergyProducer energyProducer, PowerGridNode location,
+            PowerGeneratingTechnology technology) {
+        specifyNotPersist(time, energyProducer, location, technology);
+        this.persist();
+    }
+
     public void specifyNotPersist(long time, EnergyProducer energyProducer, PowerGridNode location,
             PowerGeneratingTechnology technology) {
         String label = energyProducer.getName() + " - " + technology.getName();
