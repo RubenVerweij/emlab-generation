@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Copyright 2012 the original author or authors.
-  
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-  
-    http://www.apache.org/licenses/LICENSE-2.0
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
+<!-- Copyright 2012 the original author or authors. Licensed under the Apache 
+	License, Version 2.0 (the "License"); you may not use this file except in 
+	compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<!-- Bean post processor to persist created beans -->
 	<bean class="agentspring.graphdb.PersistingBeanPostProcessor" />
@@ -24,10 +16,10 @@
 	<!-- Decarbonization Model -->
 	<bean id="decarbonizationModel" class="emlab.gen.domain.agent.DecarbonizationModel"
 		p:name="Decarbonization Model" p:simulationLength="${simulationLength}"
-		p:co2TradingImplemented="${co2TradingImplemented}"
-		p:realRenewableDataImplemented="false"
-		p:iterationSpeedFactor="3" p:iterationSpeedCriterion="0.005"
-		p:capDeviationCriterion="0.005">
+		p:co2TradingImplemented="false"
+		p:realRenewableDataImplemented="false" p:iterationSpeedFactor="3"
+		p:iterationSpeedCriterion="0.005" p:capDeviationCriterion="0.005" p:deletionOldPPDPBidsAndCashFlowsEnabled="true"
+		p:deletionAge="2">
 	</bean>
 
 	<bean class="emlab.gen.trend.TriangularTrend" id="demandGrowthTrendNL"
@@ -43,8 +35,7 @@
 	<bean id="naturalgas" class="emlab.gen.domain.technology.Substance"
 		p:name="Natural Gas" p:quality="1" p:energyDensity="36" p:co2Density="0.00187" />
 	<bean id="biomass" class="emlab.gen.domain.technology.Substance"
-		p:name="Biomass" p:quality="0.5" p:energyDensity="25000"
-		p:co2Density="0" />
+		p:name="Biomass" p:quality="0.5" p:energyDensity="25000" p:co2Density="0" />
 	<bean id="uranium" class="emlab.gen.domain.technology.Substance"
 		p:name="Uranium" p:quality="1" p:energyDensity="3888000000"
 		p:co2Density="0" />
@@ -256,8 +247,9 @@
 
 	<!-- CO2 Auction -->
 	<bean id="co2Auction" class="emlab.gen.domain.market.CO2Auction"
-		p:auction="true" p:referencePrice="0" p:name="CO2 auction" p:substance-ref="co2"/>
-		
+		p:auction="true" p:referencePrice="0" p:name="CO2 auction"
+		p:substance-ref="co2" />
+
 	<!-- Fuel Prices -->
 	<bean id="coalPrice" class="emlab.gen.trend.TimeSeriesCSVReader" p:filename="/data/exampleCoalSingleColumn.csv" />
 	<bean id="gasPrice" class="emlab.gen.trend.TimeSeriesCSVReader" p:filename="/data/exampleMultipleTimeSeries.csv" p:delimiter="," p:variableName="gasPrice" />
@@ -305,7 +297,8 @@
 		p:debtRatioOfInvestments="0.7"
 		p:dismantlingProlongingYearsAfterTechnicalLifetime="0"
 		p:dismantlingRequiredOperatingProfit="0" p:downpaymentFractionOfCash="0.5"
-		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
+		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" 
+		p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
 		p:investorMarket-ref="germanElectricitySpotMarket"/>
 	<bean id="energyProducerB" class="emlab.gen.domain.agent.EnergyProducer"
 		p:name="Energy Producer B" p:cash="${startCash}"
@@ -316,7 +309,8 @@
 		p:debtRatioOfInvestments="0.7"
 		p:dismantlingProlongingYearsAfterTechnicalLifetime="0"
 		p:dismantlingRequiredOperatingProfit="0" p:downpaymentFractionOfCash="0.5"
-		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
+		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" 
+		p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
 		p:investorMarket-ref="germanElectricitySpotMarket"/>
 	<bean id="energyProducerC" class="emlab.gen.domain.agent.EnergyProducer"
 		p:investmentRole-ref="standardInvestmentRole"
@@ -327,7 +321,8 @@
 		p:debtRatioOfInvestments="0.7"
 		p:dismantlingProlongingYearsAfterTechnicalLifetime="0"
 		p:dismantlingRequiredOperatingProfit="0" p:downpaymentFractionOfCash="0.5"
-		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
+		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" 
+		p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
 		p:investorMarket-ref="germanElectricitySpotMarket"/>
 	<bean id="energyProducerD" class="emlab.gen.domain.agent.EnergyProducer"
 		p:investmentRole-ref="standardInvestmentRole"
@@ -338,7 +333,8 @@
 		p:debtRatioOfInvestments="0.7"
 		p:dismantlingProlongingYearsAfterTechnicalLifetime="0"
 		p:dismantlingRequiredOperatingProfit="0" p:downpaymentFractionOfCash="0.5"
-		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
+		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" 
+		p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
 		p:investorMarket-ref="germanElectricitySpotMarket"/>
 	<bean id="energyProducerE" class="emlab.gen.domain.agent.EnergyProducer"
 		p:investmentRole-ref="standardInvestmentRole"
@@ -349,7 +345,8 @@
 		p:debtRatioOfInvestments="0.7"
 		p:dismantlingProlongingYearsAfterTechnicalLifetime="0"
 		p:dismantlingRequiredOperatingProfit="0" p:downpaymentFractionOfCash="0.5"
-		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
+		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" 
+		p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
 		p:investorMarket-ref="germanElectricitySpotMarket"/>
 	<bean id="energyProducerF" class="emlab.gen.domain.agent.EnergyProducer"
 		p:name="Energy Producer F" p:cash="${startCash}"
@@ -360,7 +357,7 @@
 		p:debtRatioOfInvestments="0.7"
 		p:dismantlingProlongingYearsAfterTechnicalLifetime="0"
 		p:dismantlingRequiredOperatingProfit="0" p:downpaymentFractionOfCash="0.5"
-		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
+		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}"  p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
 		p:investorMarket-ref="beneluxElectricitySpotMarket"/>
 	<bean id="energyProducerG" class="emlab.gen.domain.agent.EnergyProducer"
 		p:name="Energy Producer G" p:cash="${startCash}"
@@ -371,7 +368,7 @@
 		p:debtRatioOfInvestments="0.7"
 		p:dismantlingProlongingYearsAfterTechnicalLifetime="0"
 		p:dismantlingRequiredOperatingProfit="0" p:downpaymentFractionOfCash="0.5"
-		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
+		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}"  p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
 		p:investorMarket-ref="beneluxElectricitySpotMarket"/>
 	<bean id="energyProducerH" class="emlab.gen.domain.agent.EnergyProducer"
 		p:name="Energy Producer H" p:cash="${startCash}"
@@ -382,7 +379,8 @@
 		p:debtRatioOfInvestments="0.7"
 		p:dismantlingProlongingYearsAfterTechnicalLifetime="0"
 		p:dismantlingRequiredOperatingProfit="0" p:downpaymentFractionOfCash="0.5"
-		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
+		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" 
+		p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
 		p:investorMarket-ref="beneluxElectricitySpotMarket"/>
 	<bean id="energyProducerI" class="emlab.gen.domain.agent.EnergyProducer"
 		p:name="Energy Producer I" p:cash="${startCash}"
@@ -393,10 +391,12 @@
 		p:debtRatioOfInvestments="0.7"
 		p:dismantlingProlongingYearsAfterTechnicalLifetime="0"
 		p:dismantlingRequiredOperatingProfit="0" p:downpaymentFractionOfCash="0.5"
-		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}" p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
+		p:willingToInvest="true" p:priceMarkUp="${priceMarkUp}"
+		p:numberOfYearsBacklookingForForecasting="${numberOfYearsBacklookingForForecasting}"
 		p:investorMarket-ref="beneluxElectricitySpotMarket"/>
-	
+
 	<bean id="standardInvestmentRole" class="emlab.gen.role.investment.InvestInPowerGenerationTechnologiesRole"/>
+
 
 	<bean id="powerPlantManufacturer" class="emlab.gen.domain.agent.PowerPlantManufacturer"
 		p:name="Power Plant Manufacturer" />
@@ -552,6 +552,19 @@
 		<property name="governedZone" ref="de" />
 	</bean>
 
+	<!-- Strategic Reserve -->
+
+	<bean id="strategicReserveOperator1" class="emlab.gen.domain.agent.StrategicReserveOperator"
+		p:name="StrategicReserveOperatorNL" p:cash="1000" p:reservePriceSR="1500"
+		p:reserveVolumePercentSR="0.1">
+		<property name="zone" ref="nl" />
+	</bean>
+
+	<bean id="strategicReserveOperator2" class="emlab.gen.domain.agent.StrategicReserveOperator"
+		p:name="StrategicReserveOperatorDE" p:cash="1000" p:reservePriceSR="1200"
+		p:reserveVolumePercentSR="0.1">
+		<property name="zone" ref="de" />
+	</bean>
 
 	<!-- Power Genration Technologies -->
 
@@ -711,7 +724,8 @@
 	<!-- Parameter file -->
 	<bean id="projectPropertyConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="classpath:scenarios/parametersA-Old.properties" />
+		<property name="location"
+			value="classpath:scenarios/parametersA-Old.properties" />
 	</bean>
 
 </beans>
