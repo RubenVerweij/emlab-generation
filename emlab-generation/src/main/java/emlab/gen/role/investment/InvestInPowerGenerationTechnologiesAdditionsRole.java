@@ -51,6 +51,7 @@ import emlab.gen.domain.technology.PowerPlant;
 import emlab.gen.domain.technology.Substance;
 import emlab.gen.domain.technology.SubstanceShareInFuelMix;
 import emlab.gen.repository.Reps;
+import emlab.gen.repository.StrategicReserveOperatorRepository;
 import emlab.gen.util.GeometricTrendRegression;
 import emlab.gen.util.MapValueComparator;
 
@@ -72,6 +73,10 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
     @Transient
     @Autowired
     Neo4jTemplate template;
+
+    @Transient
+    @Autowired
+    StrategicReserveOperatorRepository strategicReserveOperatorRepository;
 
     // market expectations
     @Transient
@@ -323,8 +328,10 @@ public class InvestInPowerGenerationTechnologiesAdditionsRole<T extends EnergyPr
                     // logger.warn(agent +
                     // " will not invest in {} technology because there's too much capacity in the pipeline",
                     // technology);
-                } else if (plant.getActualInvestedCapital() * (1 - agent.getDebtRatioOfInvestments()) > agent
-                        .getDownpaymentFractionOfCash() * agent.getCash()) {
+                } else if (agent.getInvestorIncludeCreditRisk().equals("false")
+                        && plant.getActualInvestedCapital() * (1 - agent.getDebtRatioOfInvestments()) > agent
+                                .getDownpaymentFractionOfCash() * agent.getCash()) {
+
                     // logger.warn(agent +
                     // " will not invest in {} technology as he does not have enough money for downpayment",
                     // technology);
