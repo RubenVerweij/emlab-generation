@@ -37,6 +37,9 @@ public class EnergyProducerAdditions extends EnergyProducer implements Agent {
     private String diversificationProfile;
     private String conservativenessRiskProfile;
 
+    @SimulationParameter(label = "Loan interest risk free Rate", from = 0, to = 1)
+    private double loanInterestRiskRate;
+
     // these parameters are beloning to the credit-risk consideration
 
     @SimulationParameter(label = "Loan Interest free Rate", from = 0, to = 1)
@@ -272,6 +275,14 @@ public class EnergyProducerAdditions extends EnergyProducer implements Agent {
 
     public void setMarketGiantCapacity(double marketGiantCapacity) {
         this.marketGiantCapacity = marketGiantCapacity;
+    }
+
+    public double getLoanInterestRiskRate() {
+        return loanInterestRiskRate;
+    }
+
+    public void setLoanInterestRiskRate(double loanInterestRiskRate) {
+        this.loanInterestRiskRate = loanInterestRiskRate;
     }
 
 }

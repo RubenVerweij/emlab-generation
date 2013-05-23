@@ -84,6 +84,7 @@ public class InvestInPowerGenerationTechnologiesAdditions2Role<T extends EnergyP
     Map<ElectricitySpotMarket, MarketInformation> marketInfoMap = new HashMap<ElectricitySpotMarket, MarketInformation>();
 
     @Override
+    @Transactional
     public void act(T agent) {
 
         long futureTimePoint = getCurrentTick() + agent.getInvestmentFutureTimeHorizon();
@@ -204,6 +205,9 @@ public class InvestInPowerGenerationTechnologiesAdditions2Role<T extends EnergyP
             double pricedDebtTotal = assetTotal - equityValueBS;
 
             // Calculation of credit-risk interest rate
+            // agent.setLoanInterestRiskRate((-1 / agent.getTimeToMaturity() *
+            // Math.log(pricedDebtTotal / debtTotal)));
+
             loanInterestRiskRate = -1 / agent.getTimeToMaturity() * Math.log(pricedDebtTotal / debtTotal);
 
         } else {
@@ -761,6 +765,7 @@ public class InvestInPowerGenerationTechnologiesAdditions2Role<T extends EnergyP
          * technologyProbabilityArray + " for the following technologies " +
          * technologyNameArray + " the best technology is " + bestTechnology); }
          * 
+         * 
          * if (bestTechnology != null &&
          * agent.getInvestorIncludeCreditRisk().equals("true")) {
          * 
@@ -828,6 +833,8 @@ public class InvestInPowerGenerationTechnologiesAdditions2Role<T extends EnergyP
                         agent.getLoanInterestRate());
             }
 
+            agent.setLoanInterestRiskRate(loanInterestRiskRate);
+
             // logger.warn("Loan amount is: " + amount);
             Loan loan = reps.loanRepository.createLoan(agent, bigbank, amount, plant.getTechnology()
                     .getDepreciationTime(), getCurrentTick(), plant);
@@ -836,7 +843,8 @@ public class InvestInPowerGenerationTechnologiesAdditions2Role<T extends EnergyP
 
             double investments = plant.getActualNominalCapacity();
 
-            logger.warn(agent + " invested " + investments);
+            // logger.warn(agent + " invested " + investments + " against rate "
+            // + 100 * agent.getLoanInterestRiskRate());
 
         } else {
             // logger.warn("{} found no suitable technology anymore to invest in at tick "
