@@ -59,7 +59,7 @@ import emlab.gen.util.MapValueComparator;
 /**
  * {@link EnergyProducer}s decide to invest in new {@link PowerPlant}
  * 
- * @author R. Verweij This algorithm could include technology preferences,
+ * @author R. Verweij This algorithm optionally includes technology preferences,
  *         credit-risk considerations and risk-averse behaviour
  */
 @Configurable
@@ -432,8 +432,10 @@ public class InvestInPowerGenerationTechnologiesAdditions2Role<T extends EnergyP
                                         + agent.getRiskPremiumNuclear() + agent.getDebtRatioOfInvestments()
                                         * loanInterestRiskRate;
 
-                            } else if (technology.getName().equals("CoalPulverized")
-                                    || technology.getName().equals("CoalPulverizedCSS")) {
+                            } else if (technology.getName().equals("CoalPSC") || technology.getName().equals("IGCC")
+                                    || technology.getName().equals("Lignite")
+                                    || technology.getName().equals("CoalPscCSS")
+                                    || technology.getName().equals("IgccCCS")) {
 
                                 wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
                                         + agent.getRiskPremiumCoal() + agent.getDebtRatioOfInvestments()
@@ -475,8 +477,10 @@ public class InvestInPowerGenerationTechnologiesAdditions2Role<T extends EnergyP
                                         + agent.getRiskPremiumNuclear() + agent.getDebtRatioOfInvestments()
                                         * agent.getLoanInterestRate();
 
-                            } else if (technology.getName().equals("CoalPulverized")
-                                    || technology.getName().equals("CoalPulverizedCSS")) {
+                            } else if (technology.getName().equals("CoalPSC") || technology.getName().equals("IGCC")
+                                    || technology.getName().equals("Lignite")
+                                    || technology.getName().equals("CoalPscCSS")
+                                    || technology.getName().equals("IgccCCS")) {
 
                                 wacc = (1 - agent.getDebtRatioOfInvestments()) * agent.getEquityInterestRate()
                                         + agent.getRiskPremiumCoal() + agent.getDebtRatioOfInvestments()
@@ -825,7 +829,7 @@ public class InvestInPowerGenerationTechnologiesAdditions2Role<T extends EnergyP
             if (agent.getInvestorIncludeCreditRisk().equals("true")) {
 
                 amount = determineLoanAnnuities(investmentCostPayedByDebt, plant.getTechnology().getDepreciationTime(),
-                        loanInterestRiskRate);
+                        agent.getLoanInterestRate());
 
             } else {
 
